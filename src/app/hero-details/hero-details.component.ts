@@ -17,7 +17,14 @@ import { Hero } from '../_interfaces/hero.interface';
 import { Store, select } from '@ngrx/store';
 import { ActivatedRoute } from '@angular/router';
 import { getHeroById } from '../store/superheroes/superheroes.selectors';
-import { saveHero } from '../store/superheroes/superheroes.actions';
+import {
+  saveHeroSuccess,
+  toggleLoadingHeroes,
+} from '../store/superheroes/superheroes.actions';
+import { Subject, take, takeUntil } from 'rxjs';
+import { HeroesService } from '../_services/heroes.service';
+import { HeroDialogComponent } from '../_components/dialog-success-added/dialog-success-added.component';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'mindata-hero-details',
@@ -35,9 +42,12 @@ import { saveHero } from '../store/superheroes/superheroes.actions';
   styleUrl: './hero-details.component.scss',
 })
 export class HeroDetailsComponent implements OnInit {
+  private unsubscribe$: Subject<void> = new Subject<void>();
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
   private store = inject(Store);
+  private heroService = inject(HeroesService);
+  private dialog = inject(MatDialog);
   formHero!: FormGroup;
   _id: string | null = null;
 
@@ -54,7 +64,7 @@ export class HeroDetailsComponent implements OnInit {
       this._id = params.get('id');
       if (this._id) {
         this.store
-          .pipe(select(getHeroById(this._id)))
+          .pipe(takeUntil(this.unsubscribe$), select(getHeroById(this._id)))
           .subscribe((data: Hero) => {
             this.formHero.patchValue(data);
           });
@@ -65,8 +75,21 @@ export class HeroDetailsComponent implements OnInit {
   saveHero() {
     if (this.formHero.valid) {
       const heroData: Hero = this.formHero.value;
-      this.store.dispatch(saveHero(heroData));
+      this.store.dispatch(toggleLoadingHeroes({ payload: true }));
+      this.heroService
+        .saveHero(heroData)
+        .pipe(take(1))
+        .subscribe((hero) => {
+          this.store.dispatch(saveHeroSuccess(hero));
+          this.store.dispatch(toggleLoadingHeroes({ payload: false }));
+          this.dialog.open(HeroDialogComponent);
+        });
     }
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 }
 

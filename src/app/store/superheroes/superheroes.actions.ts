@@ -6,6 +6,7 @@ export const toggleLoadingHeroes = createAction(
   props<{ payload: boolean }>()
 );
 export const fetchHeroes = createAction('[HEROES] fetch superheroes');
+
 export const loadHeroesSuccess = createAction(
   '[HEROES] Load superhero success',
   props<{ payload: Hero[] }>()
@@ -15,6 +16,11 @@ export const searchHero = createAction(
   props<{ name: string }>()
 );
 export const saveHero = createAction('[HEROES] Save superhero', props<Hero>());
+
+export const saveHeroSuccess = createAction(
+  '[HEROES] Saved superhero success',
+  props<Hero>()
+);
 
 export const removeHero = createAction(
   '[HEROES] Remove superhero',

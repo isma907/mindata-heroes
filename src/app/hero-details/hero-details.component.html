@@ -17,6 +17,7 @@
                 placeholder="URL"
                 formControlName="imageUrl"
                 type="text"
+                name="imageUrl"
               />
               <mat-error>
                 @if(formHero.get('imageUrl')?.errors){ Ingresar una url válida }
@@ -32,6 +33,7 @@
                 placeholder="Nombre"
                 formControlName="name"
                 type="text"
+                name="name"
               />
               <mat-error>
                 @if(formHero.get('name')?.errors){ Este campo es requerido }
@@ -45,6 +47,7 @@
                 placeholder="Primer Aparición"
                 formControlName="firstAppearance"
                 type="text"
+                name="firstAppearance"
               />
               <mat-error>
                 @if(formHero.get('firstAppearance')?.errors){ Este campo es
@@ -59,6 +62,7 @@
                 placeholder="Autor"
                 formControlName="publisher"
                 type="text"
+                name="publisher"
               />
               <mat-error>
                 @if(formHero.get('publisher')?.errors){ Este campo es requerido

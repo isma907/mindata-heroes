@@ -5,20 +5,13 @@ import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DeleteConfirmationComponent } from '../_components/confirm-delete/confirm-delete.component';
-import { HeroesService } from '../_services/heroes.service';
 import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Store } from '@ngrx/store';
-import {
-  getSuperHeroesLoading,
-  selectFilteredSuperheroes,
-} from '../store/superheroes/superheroes.selectors';
+import { selectFilteredSuperheroes } from '../store/superheroes/superheroes.selectors';
 import { HeroCardComponent } from '../_components/hero-card/hero-card.component';
-import {
-  fetchHeroes,
-  removeHero,
-} from '../store/superheroes/superheroes.actions';
+import { removeHero } from '../store/superheroes/superheroes.actions';
 import { HeroPaginatorComponent } from '../_components/hero-paginator/hero-paginator.component';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { animate, style, transition, trigger } from '@angular/animations';
@@ -50,24 +43,14 @@ import { HeaderComponent } from '../_components/header/header.component';
     ]),
   ],
 })
-export class HeroesListComponent implements OnInit, OnDestroy {
+export class HeroesListComponent implements OnDestroy {
   private unsubscribe$: Subject<void> = new Subject<void>();
   private store = inject(Store);
-  private heroService = inject(HeroesService);
   private dialog = inject(MatDialog);
 
   heroList$: Observable<filteredData> = this.store.select(
     selectFilteredSuperheroes
   );
-  loadingList$ = this.store.select(getSuperHeroesLoading);
-
-  ngOnInit(): void {
-    this.fetchData();
-  }
-
-  fetchData() {
-    this.store.dispatch(fetchHeroes());
-  }
 
   delete(hero: Hero) {
     const dialogRef = this.dialog.open(DeleteConfirmationComponent, {

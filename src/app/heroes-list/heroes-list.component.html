@@ -1,14 +1,5 @@
-<mindata-header />
-
 <div class="hero-list-wrapper">
-  @if(loadingList$ | async){
-  <mat-progress-spinner
-    color="accent"
-    mode="indeterminate"
-    class="heroes-loader"
-  />
-
-  } @if(heroList$ | async; as heroesData){
+  @if(heroList$ | async; as heroesData){
   <section class="hero-list-wrapper-grid">
     @for (hero of heroesData.showElements; track hero._id) {
     <mindata-hero-card
@@ -18,7 +9,6 @@
     />
     }
   </section>
-
   <mindata-hero-paginator [heroes]="heroesData.heroesList" />
   }
 </div>
