@@ -1,0 +1,21 @@
+<header class="app-header">
+  <form [formGroup]="FilterForm">
+    <mat-form-field class="search-form-field" appearance="outline">
+      <mat-label>Filtrar por</mat-label>
+      <mat-select formControlName="filterBy">
+        <mat-option value="_id">ID</mat-option>
+        <mat-option value="name">Nombre</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field class="search-form-field" appearance="outline">
+      <mat-label>Buscar</mat-label>
+      <input
+        matInput
+        placeholder="Buscar"
+        formControlName="query"
+        type="text"
+      />
+    </mat-form-field>
+  </form>
+</header>
