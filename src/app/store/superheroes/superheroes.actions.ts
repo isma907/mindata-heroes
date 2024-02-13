@@ -14,7 +14,7 @@ export const searchHero = createAction(
   '[HEROES] search superhero',
   props<{ name: string }>()
 );
-export const addHero = createAction('[HEROES] Add superhero');
+export const saveHero = createAction('[HEROES] Save superhero', props<Hero>());
 
 export const removeHero = createAction(
   '[HEROES] Remove superhero',

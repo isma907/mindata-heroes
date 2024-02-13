@@ -1,25 +1,24 @@
+<mindata-header />
+
 <div class="hero-list-wrapper">
   @if(loadingList$ | async){
   <mat-progress-spinner
     color="accent"
     mode="indeterminate"
     class="heroes-loader"
-  >
-  </mat-progress-spinner>
+  />
 
-  } @if(heroList$ |async; as heroesData){
+  } @if(heroList$ | async; as heroesData){
   <section class="hero-list-wrapper-grid">
     @for (hero of heroesData.showElements; track hero._id) {
     <mindata-hero-card
       [@itemAnimation]="true"
       [hero]="hero"
       (deleteHero)="delete(hero)"
-    ></mindata-hero-card>
+    />
     }
   </section>
 
-  <mindata-hero-paginator
-    [heroes]="heroesData.heroesList"
-  ></mindata-hero-paginator>
+  <mindata-hero-paginator [heroes]="heroesData.heroesList" />
   }
 </div>

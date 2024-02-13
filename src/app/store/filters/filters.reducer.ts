@@ -4,20 +4,13 @@ import {
   setSearchValue,
   updatePagination as updatePageSize,
 } from './filters.actions';
-import { FormFilter } from '../../_interfaces/filter.interface';
+import { FilterState, FormFilter } from '../../_interfaces/filter.interface';
 
-export interface FilterState {
-  query: string;
-  filterBy: string;
-  pageIndex: number;
-  pageSize: number;
-}
-
-export const initialState = {
+export const initialState: FilterState = {
   query: '',
   filterBy: 'name',
   pageIndex: 0,
-  pageSize: 15,
+  pageSize: 24,
 };
 
 const _paginationReducer = createReducer(

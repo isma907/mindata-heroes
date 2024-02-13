@@ -1,21 +1,29 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { SuperHeroState } from './superheroes.reducer';
-import { Hero, filteredData } from '../../_interfaces/hero.interface';
+import {
+  Hero,
+  SuperHeroState,
+  filteredData,
+} from '../../_interfaces/hero.interface';
 import { getFilters } from '../filters/filters.selectors';
-import { FilterState } from '../filters/filters.reducer';
+import { FilterState } from '../../_interfaces/filter.interface';
 
 export const superHeroesFeature =
   createFeatureSelector<SuperHeroState>('superheroes');
 
 export const getSuperHeroes = createSelector(
   superHeroesFeature,
-  (state: SuperHeroState) => state.superheroes
+  (state: SuperHeroState) => state.list
 );
 
 export const getSuperHeroesLoading = createSelector(
   superHeroesFeature,
   (state: SuperHeroState) => state.loading
 );
+
+export const getHeroById = (_id: string) =>
+  createSelector(superHeroesFeature, (state: SuperHeroState): Hero => {
+    return state.list.filter((item) => item._id === _id)[0];
+  });
 
 function filterHeroes(superheroes: Hero[], filters: FilterState): Hero[] {
   return superheroes.filter((superhero) => {

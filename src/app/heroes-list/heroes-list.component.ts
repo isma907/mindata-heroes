@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Hero, filteredData } from '../_interfaces/hero.interface';
 
 import { MatTableModule } from '@angular/material/table';
@@ -20,8 +20,9 @@ import {
   removeHero,
 } from '../store/superheroes/superheroes.actions';
 import { HeroPaginatorComponent } from '../_components/hero-paginator/hero-paginator.component';
-import { Observable } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { animate, style, transition, trigger } from '@angular/animations';
+import { HeaderComponent } from '../_components/header/header.component';
 
 @Component({
   selector: 'mindata-heroes-list',
@@ -35,6 +36,7 @@ import { animate, style, transition, trigger } from '@angular/animations';
     CommonModule,
     HeroCardComponent,
     HeroPaginatorComponent,
+    HeaderComponent,
   ],
   templateUrl: './heroes-list.component.html',
   styleUrl: './heroes-list.component.scss',
@@ -48,10 +50,11 @@ import { animate, style, transition, trigger } from '@angular/animations';
     ]),
   ],
 })
-export class HeroesListComponent implements OnInit {
-  heroService = inject(HeroesService);
-  store = inject(Store);
-  dialog = inject(MatDialog);
+export class HeroesListComponent implements OnInit, OnDestroy {
+  private unsubscribe$: Subject<void> = new Subject<void>();
+  private store = inject(Store);
+  private heroService = inject(HeroesService);
+  private dialog = inject(MatDialog);
 
   heroList$: Observable<filteredData> = this.store.select(
     selectFilteredSuperheroes
@@ -70,10 +73,18 @@ export class HeroesListComponent implements OnInit {
     const dialogRef = this.dialog.open(DeleteConfirmationComponent, {
       data: hero,
     });
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.store.dispatch(removeHero({ hero: hero }));
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((result) => {
+        if (result) {
+          this.store.dispatch(removeHero({ hero: hero }));
+        }
+      });
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
   }
 }

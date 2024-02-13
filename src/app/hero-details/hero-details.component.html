@@ -1,0 +1,78 @@
+<div class="hero-detail-wrapper">
+  <mat-card class="card-container">
+    <mat-card-content class="card-content">
+      <img
+        src="{{ formHero.get('imageUrl')?.value }}"
+        alt=""
+        class="card-image-wrapper"
+      />
+
+      <div class="card-form-wrapper">
+        <form [formGroup]="formHero">
+          <div class="form-row">
+            <mat-form-field class="search-form-field" appearance="outline">
+              <mat-label>Imagen</mat-label>
+              <input
+                matInput
+                placeholder="URL"
+                formControlName="imageUrl"
+                type="text"
+              />
+              <mat-error>
+                @if(formHero.get('imageUrl')?.errors){ Ingresar una url válida }
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field class="search-form-field" appearance="outline">
+              <mat-label>Nombre</mat-label>
+              <input
+                matInput
+                placeholder="Nombre"
+                formControlName="name"
+                type="text"
+              />
+              <mat-error>
+                @if(formHero.get('name')?.errors){ Este campo es requerido }
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="search-form-field" appearance="outline">
+              <mat-label>Primer Aparición</mat-label>
+              <input
+                matInput
+                placeholder="Primer Aparición"
+                formControlName="firstAppearance"
+                type="text"
+              />
+              <mat-error>
+                @if(formHero.get('firstAppearance')?.errors){ Este campo es
+                requerido }
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field class="search-form-field" appearance="outline">
+              <mat-label>Autor</mat-label>
+              <input
+                matInput
+                placeholder="Autor"
+                formControlName="publisher"
+                type="text"
+              />
+              <mat-error>
+                @if(formHero.get('publisher')?.errors){ Este campo es requerido
+                }
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </form>
+      </div>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <button mat-button [disabled]="formHero.invalid" (click)="saveHero()">
+        Guardar
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

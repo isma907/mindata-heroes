@@ -12,9 +12,9 @@ import { Store } from '@ngrx/store';
 
 @Injectable()
 export class SuperHeroesEffects {
-  actions$ = inject(Actions);
-  heroService = inject(HeroesService);
-  store = inject(Store);
+  private actions$ = inject(Actions);
+  private heroService = inject(HeroesService);
+  private store = inject(Store);
 
   loadMovies$ = createEffect(() =>
     this.actions$.pipe(

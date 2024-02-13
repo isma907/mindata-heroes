@@ -1,5 +1,5 @@
 <header class="app-header">
-  <form [formGroup]="FilterForm">
+  <form [formGroup]="FilterForm" class="app-header-form">
     <mat-form-field class="search-form-field" appearance="outline">
       <mat-label>Filtrar por</mat-label>
       <mat-select formControlName="filterBy">
@@ -18,4 +18,8 @@
       />
     </mat-form-field>
   </form>
+
+  <a mat-button [routerLink]="appRoute.ADD_HERO">
+    Crear nuevo <mat-icon class="material-symbols-outlined">add</mat-icon>
+  </a>
 </header>

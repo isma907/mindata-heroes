@@ -2,11 +2,11 @@
   <mat-card-header>
     <mat-card-title>{{ hero.name }}</mat-card-title>
   </mat-card-header>
-  <img mat-card-image src="{{ hero.images.lg }}" alt="{{ hero.name }}" />
-  <mat-card-actions>
-    <button mat-button>
+  <img mat-card-image src="{{ hero.imageUrl }}" alt="{{ hero.name }}" />
+  <mat-card-actions align="end">
+    <a mat-button [routerLink]="appRoute.EDIT_HERO + '/' + hero._id">
       Editar <mat-icon class="material-symbols-outlined">edit</mat-icon>
-    </button>
+    </a>
     <button mat-button color="warn" (click)="delete(hero)">
       <mat-icon class="material-symbols-outlined">delete</mat-icon>
     </button>
