@@ -3,13 +3,14 @@ import { Hero, SuperHeroApiResponse } from '../_interfaces/hero.interface';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { FILTER_BY, filterData } from '../_interfaces/filter.interface';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HeroesService {
   http = inject(HttpClient);
-  private heroesEndpoint = 'http://localhost:4000/superheroes';
+  private heroesEndpoint = `${environment.apiURL}`;
 
   heroesSignal = signal<SuperHeroApiResponse>({
     currentPage: 1,
