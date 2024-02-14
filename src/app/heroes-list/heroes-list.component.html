@@ -3,6 +3,7 @@
     @for (hero of filteredHeroes().showElements; track hero._id) {
     <mindata-hero-card
       [hero]="hero"
+      [@itemAnimation]="true"
       (deleteHero)="delete(hero)"
     ></mindata-hero-card>
     }

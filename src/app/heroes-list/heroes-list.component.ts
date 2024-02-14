@@ -1,4 +1,12 @@
-import { Component, OnDestroy, computed, inject } from '@angular/core';
+import {
+  Component,
+  Injector,
+  OnDestroy,
+  OnInit,
+  computed,
+  effect,
+  inject,
+} from '@angular/core';
 import { Hero, filteredData } from '../_interfaces/hero.interface';
 
 import { MatTableModule } from '@angular/material/table';
@@ -34,11 +42,14 @@ import { SnackbarService } from '../_services/snackbar.service';
   templateUrl: './heroes-list.component.html',
   styleUrl: './heroes-list.component.scss',
 })
-export class HeroesListComponent implements OnDestroy {
+export class HeroesListComponent implements OnInit, OnDestroy {
+  constructor(private injector: Injector) {}
   private unsubscribe$: Subject<void> = new Subject<void>();
   private dialog = inject(MatDialog);
   private heroService = inject(HeroesService);
   private snackbarService = inject(SnackbarService);
+
+  ngOnInit(): void {}
 
   paginatorData = computed(() => {
     return this.heroService.filterSignal();

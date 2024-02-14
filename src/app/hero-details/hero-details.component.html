@@ -32,6 +32,7 @@
                 matInput
                 placeholder="Nombre"
                 formControlName="name"
+                mindataUpperCase
                 type="text"
                 name="name"
               />
@@ -80,7 +81,7 @@
         mat-button
         mat-raised-button
         color="primary"
-        [disabled]="formHero.invalid"
+        [disabled]="formHero.invalid || loading()"
         (click)="saveHero()"
       >
         Guardar

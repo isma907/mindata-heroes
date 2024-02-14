@@ -19,15 +19,15 @@ import { HeroesService } from './_services/heroes.service';
 })
 export class AppComponent implements OnInit {
   appLoading = computed(() => {
-    return this.heroService.loadingSignal();
+    return this.heroesService.loadingSignal();
   });
 
-  heroService = inject(HeroesService);
+  heroesService = inject(HeroesService);
 
   ngOnInit() {
-    this.heroService.setLoading(true);
-    this.heroService.getAllHeroes().subscribe(() => {
-      this.heroService.setLoading(false);
+    this.heroesService.setLoading(true);
+    this.heroesService.getAllHeroes().subscribe(() => {
+      this.heroesService.setLoading(false);
     });
   }
 }

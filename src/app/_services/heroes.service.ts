@@ -17,7 +17,6 @@ export class HeroesService {
 
   heroesSignal = signal<Hero[]>([]);
   loadingSignal = signal<boolean>(false);
-
   filterSignal = signal<FilterState>({
     filterBy: 'name',
     query: '',
@@ -129,12 +128,7 @@ export class HeroesService {
     return new Observable((observer) => {
       setTimeout(() => {
         hero._id = uuid();
-        const heroes = this.heroesSignal();
-        heroes.unshift(hero);
-
-        this.heroes.unshift(hero);
-        this.heroesSignal.set(heroes);
-
+        this.heroesSignal().unshift(hero);
         observer.next(hero);
         observer.complete();
       }, 1000);

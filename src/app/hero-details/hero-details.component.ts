@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -19,6 +19,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { HeroesService } from '../_services/heroes.service';
 import { SnackbarService } from '../_services/snackbar.service';
 import { APP_ROUTES_ENUM } from '../app.routes';
+import { UpperCaseDirective } from '../_directives/upper-case.directive';
 
 @Component({
   selector: 'mindata-hero-details',
@@ -32,6 +33,7 @@ import { APP_ROUTES_ENUM } from '../app.routes';
     ReactiveFormsModule,
     MatButtonModule,
     RouterModule,
+    UpperCaseDirective,
   ],
   templateUrl: './hero-details.component.html',
   styleUrl: './hero-details.component.scss',
@@ -40,12 +42,17 @@ export class HeroDetailsComponent implements OnInit {
   private unsubscribe$: Subject<void> = new Subject<void>();
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
-  private heroService = inject(HeroesService);
+  private heroesService = inject(HeroesService);
   private snackbarService = inject(SnackbarService);
+
   appRoute = APP_ROUTES_ENUM;
 
   formHero!: FormGroup;
   _id: string | null = null;
+
+  loading = computed<boolean>(() => {
+    return this.heroesService.loadingSignal();
+  });
 
   ngOnInit() {
     this.formHero = this.fb.group({
@@ -59,12 +66,12 @@ export class HeroDetailsComponent implements OnInit {
     this.route.paramMap.subscribe((params) => {
       this._id = params.get('id');
       if (this._id) {
-        this.heroService.setLoading(true);
-        this.heroService
+        this.heroesService.setLoading(true);
+        this.heroesService
           .getHeroById(this._id)
           .pipe(takeUntil(this.unsubscribe$))
           .subscribe((hero: Hero) => {
-            this.heroService.setLoading(false);
+            this.heroesService.setLoading(false);
             if (hero) this.formHero.setValue(hero);
           });
       }
@@ -76,13 +83,16 @@ export class HeroDetailsComponent implements OnInit {
       const heroData: Hero = this.formHero.value;
 
       const saveEndpoint = this._id
-        ? this.heroService.saveHero(heroData)
-        : this.heroService.addHero(heroData);
+        ? this.heroesService.saveHero(heroData)
+        : this.heroesService.addHero(heroData);
+
+      this.heroesService.setLoading(true);
 
       saveEndpoint.pipe(takeUntil(this.unsubscribe$)).subscribe((hero) => {
         this.snackbarService.showSnackbar(
           `${hero.name} guardado correctamente`
         );
+        this.heroesService.setLoading(false);
       });
     }
   }
