@@ -1,11 +1,11 @@
-export interface FilterState {
-  query: string;
-  filterBy: string;
-  pageIndex: number;
-  pageSize: number;
+export enum FILTER_BY {
+  id = '_id',
+  name = 'name',
 }
 
-export interface FormFilter {
-  filterBy: string;
-  query: string;
+export interface filterData {
+  search: string;
+  filterBy: FILTER_BY;
+  limit: number;
+  page: number;
 }

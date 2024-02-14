@@ -1,14 +1,31 @@
 <div class="hero-list-wrapper">
-  @if(heroList$ | async; as heroesData){
   <section class="hero-list-wrapper-grid">
-    @for (hero of heroesData.showElements; track hero._id) {
+    @for (hero of heroData().data; track hero._id) {
     <mindata-hero-card
-      [@itemAnimation]="true"
       [hero]="hero"
       (deleteHero)="delete(hero)"
-    />
+    ></mindata-hero-card>
     }
   </section>
-  <mindata-hero-paginator [heroes]="heroesData.heroesList" />
-  }
+
+  <div class="hero-list-paginator">
+    <button
+      mat-button
+      mat-raised-button
+      color="primary"
+      (click)="prevPage()"
+      [disabled]="!heroData().prevPage || loading()"
+    >
+      Prev
+    </button>
+    <button
+      mat-button
+      mat-raised-button
+      color="primary"
+      (click)="nextPage()"
+      [disabled]="!heroData().nextPage || loading()"
+    >
+      Next
+    </button>
+  </div>
 </div>

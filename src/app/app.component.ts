@@ -1,11 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, computed, effect, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './_components/header/header.component';
-import { Store } from '@ngrx/store';
-import { fetchHeroes } from './store/superheroes/superheroes.actions';
-import { getSuperHeroesLoading } from './store/superheroes/superheroes.selectors';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { HeroesService } from './_services/heroes.service';
+import { LoadingService } from './_services/loading.service';
 
 @Component({
   selector: 'app-root',
@@ -19,12 +18,22 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent implements OnInit {
-  private store = inject(Store);
+export class AppComponent {
+  private loadingService = inject(LoadingService);
 
-  loadingList$ = this.store.select(getSuperHeroesLoading);
+  appLoading = computed(() => {
+    return this.loadingService.loadingSignal();
+  });
 
-  ngOnInit() {
-    this.store.dispatch(fetchHeroes());
-  }
+  heroesService = inject(HeroesService);
+
+  filterChangeEffect = effect(
+    () => {
+      const filters = this.heroesService.searchSignal();
+      this.heroesService.searchHeroes(filters).subscribe((res) => {
+        this.heroesService.setHeroes(res);
+      });
+    },
+    { allowSignalWrites: true }
+  );
 }
