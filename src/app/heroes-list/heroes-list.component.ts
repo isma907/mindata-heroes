@@ -69,11 +69,14 @@ export class HeroesListComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((result) => {
         if (result) {
-          this.heroesService.removeHero(hero._id).subscribe(() => {
-            this.snackbarService.showSnackbar(
-              `${hero.name} eliminado correctamente`
-            );
-          });
+          this.heroesService
+            .removeHero(hero._id)
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe(() => {
+              this.snackbarService.showSnackbar(
+                `${hero.name} eliminado correctamente`
+              );
+            });
         }
       });
   }

@@ -5,6 +5,7 @@ import { HeaderComponent } from './_components/header/header.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HeroesService } from './_services/heroes.service';
 import { LoadingService } from './_services/loading.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -20,6 +21,7 @@ import { LoadingService } from './_services/loading.service';
 })
 export class AppComponent {
   private loadingService = inject(LoadingService);
+  private unsubscribe$: Subject<void> = new Subject<void>();
 
   appLoading = computed(() => {
     return this.loadingService.loadingSignal();
@@ -30,9 +32,12 @@ export class AppComponent {
   filterChangeEffect = effect(
     () => {
       const filters = this.heroesService.searchSignal();
-      this.heroesService.searchHeroes(filters).subscribe((res) => {
-        this.heroesService.setHeroes(res);
-      });
+      this.heroesService
+        .searchHeroes(filters)
+        .pipe(takeUntil(this.unsubscribe$))
+        .subscribe((res) => {
+          this.heroesService.setHeroes(res);
+        });
     },
     { allowSignalWrites: true }
   );

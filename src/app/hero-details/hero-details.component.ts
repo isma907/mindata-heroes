@@ -66,14 +66,19 @@ export class HeroDetailsComponent implements OnInit {
       publisher: this.fb.control('', [Validators.required]),
     });
 
-    this.route.paramMap.subscribe((params) => {
-      this._id = params.get('id');
-      if (this._id) {
-        this.heroesService.getHeroById(this._id).subscribe((data) => {
-          this.formHero.setValue(data);
-        });
-      }
-    });
+    this.route.paramMap
+      .pipe(takeUntil(this.unsubscribe$))
+      .subscribe((params) => {
+        this._id = params.get('id');
+        if (this._id) {
+          this.heroesService
+            .getHeroById(this._id)
+            .pipe(takeUntil(this.unsubscribe$))
+            .subscribe((data) => {
+              this.formHero.setValue(data);
+            });
+        }
+      });
   }
 
   saveHero() {
