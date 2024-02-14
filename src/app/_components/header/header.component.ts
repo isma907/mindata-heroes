@@ -12,14 +12,13 @@ import {
   take,
   takeUntil,
 } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { setSearchValue as setFilterValues } from '../../store/filters/filters.actions';
 import { MatSelectModule } from '@angular/material/select';
-import { FilterState, FormFilter } from '../../_interfaces/filter.interface';
-import { getFilters } from '../../store/filters/filters.selectors';
 import { APP_ROUTES_ENUM } from '../../app.routes';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
+import { FilterState } from '../../_interfaces/filter.interface';
+import { HeroesService } from '../../_services/heroes.service';
+import { FILTER_BY } from '../../_interfaces/hero.interface';
 
 @Component({
   selector: 'mindata-header',
@@ -38,8 +37,8 @@ import { RouterModule } from '@angular/router';
   styleUrl: './header.component.scss',
 })
 export class HeaderComponent implements OnInit, OnDestroy {
-  private store = inject(Store);
   private fb = inject(FormBuilder);
+  private heroesService = inject(HeroesService);
   private unsubscribe$: Subject<void> = new Subject<void>();
   appRoute = APP_ROUTES_ENUM;
 
@@ -47,29 +46,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.FilterForm = this.fb.group({
-      filterBy: this.fb.control(''),
+      filterBy: this.fb.control('name'),
       query: this.fb.control(''),
     });
+  }
 
-    this.store
-      .select(getFilters)
-      .pipe(take(1))
-      .subscribe((data: FilterState) => {
-        this.FilterForm.setValue({
-          filterBy: data.filterBy,
-          query: data.query,
-        });
-      });
-
-    this.FilterForm.valueChanges
-      .pipe(
-        debounceTime(400),
-        distinctUntilChanged(),
-        takeUntil(this.unsubscribe$)
-      )
-      .subscribe((val: FormFilter) => {
-        console.log(val);
-        this.store.dispatch(setFilterValues(val));
+  search() {
+    const formVal = this.FilterForm.value;
+    this.heroesService.setLoading(true);
+    this.heroesService.setFilter(formVal);
+    this.heroesService
+      .getHeroByField(formVal.filterBy as FILTER_BY, formVal.query)
+      .subscribe(() => {
+        this.heroesService.setLoading(false);
       });
   }
 

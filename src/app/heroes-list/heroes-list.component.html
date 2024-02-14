@@ -1,14 +1,17 @@
 <div class="hero-list-wrapper">
-  @if(heroList$ | async; as heroesData){
+  <mat-paginator
+    [length]="filteredHeroes().totalItems"
+    [pageSize]="paginatorData().pageSize"
+    [pageSizeOptions]="paginatorData().pageSizeOptions"
+    (page)="changePage($event)"
+  ></mat-paginator>
+
   <section class="hero-list-wrapper-grid">
-    @for (hero of heroesData.showElements; track hero._id) {
+    @for (hero of filteredHeroes().showElements; track hero._id) {
     <mindata-hero-card
-      [@itemAnimation]="true"
       [hero]="hero"
       (deleteHero)="delete(hero)"
-    />
+    ></mindata-hero-card>
     }
   </section>
-  <mindata-hero-paginator [heroes]="heroesData.heroesList" />
-  }
 </div>

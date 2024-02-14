@@ -1,12 +1,7 @@
 <div class="main">
-  @if(loadingList$ | async){
-  <mat-progress-spinner
-    color="accent"
-    mode="indeterminate"
-    class="heroes-loader"
-  />
-  }
   <mindata-header />
-
+  @if(appLoading()){
+  <mat-spinner color="accent" />
+  }
   <router-outlet />
 </div>

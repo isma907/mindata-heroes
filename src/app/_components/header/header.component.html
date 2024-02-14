@@ -19,7 +19,7 @@
     </mat-form-field>
   </form>
 
-  <a mat-fab color="warn" [routerLink]="appRoute.HOMEPAGE">
+  <a mat-fab color="warn" [routerLink]="appRoute.HOMEPAGE" (click)="search()">
     <mat-icon class="material-symbols-outlined">search</mat-icon>
   </a>
   <a mat-button [routerLink]="appRoute.ADD_HERO">

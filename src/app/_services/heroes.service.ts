@@ -1,7 +1,10 @@
-import { Injectable, inject } from '@angular/core';
-import { Hero } from '../_interfaces/hero.interface';
+import { Injectable, inject, signal } from '@angular/core';
+import { Hero, FILTER_BY } from '../_interfaces/hero.interface';
 import { HttpClient } from '@angular/common/http';
 import { Observable, delay, tap } from 'rxjs';
+import { FilterState } from '../_interfaces/filter.interface';
+import { v4 as uuid } from 'uuid';
+import { PageEvent } from '@angular/material/paginator';
 
 @Injectable({
   providedIn: 'root',
@@ -9,20 +12,134 @@ import { Observable, delay, tap } from 'rxjs';
 export class HeroesService {
   http = inject(HttpClient);
   heroes: Hero[] = [];
+
   private heroesEndpoint = 'assets/superheroes.json';
 
-  getData(): Observable<Hero[]> {
+  heroesSignal = signal<Hero[]>([]);
+  loadingSignal = signal<boolean>(false);
+
+  filterSignal = signal<FilterState>({
+    filterBy: 'name',
+    query: '',
+    pageIndex: 0,
+    pageSize: 24,
+    pageSizeOptions: [24, 48, 72],
+  });
+
+  setFilter(newFilter: Partial<FilterState>) {
+    this.filterSignal.update((filter) => {
+      return {
+        ...filter,
+        ...newFilter,
+        pageIndex: 0,
+      };
+    });
+  }
+
+  changePage(page: number) {
+    this.filterSignal.update((filter) => {
+      filter.pageIndex = page;
+      return filter;
+    });
+  }
+
+  setPaginator(page: PageEvent) {
+    this.filterSignal.update((filter) => {
+      const res = { ...filter, ...page };
+      return res;
+    });
+  }
+
+  setLoading(enable: boolean) {
+    this.loadingSignal.set(enable);
+  }
+
+  getAllHeroes(): Observable<Hero[]> {
     return this.http.get<Hero[]>(this.heroesEndpoint).pipe(
-      delay(1000), // Para simular una llamada a un servidor y demorar la carga, esto se guarda en el STORE gracias al EFFECT de NGRX
+      delay(1000),
       tap((res) => {
         this.heroes = res;
+        this.heroesSignal.set(res);
       })
     );
   }
 
-  saveHero(hero: Hero): Observable<any> {
+  getHeroByField(field: FILTER_BY, fieldValue: string): Observable<Hero[]> {
     return new Observable((observer) => {
       setTimeout(() => {
+        const heroes = this.heroes.filter((item) => {
+          const lowerField = item[field].toLocaleLowerCase();
+          const lowerVal = fieldValue.toLocaleLowerCase();
+          return lowerField.indexOf(lowerVal) != -1;
+        });
+
+        this.heroesSignal.set(heroes);
+        observer.next(heroes);
+        observer.complete();
+      }, 2000);
+    });
+  }
+
+  getHeroById(id: string): Observable<Hero> {
+    return new Observable((observer) => {
+      setTimeout(() => {
+        const hero = this.heroesSignal().filter((item) => item._id === id)[0];
+        observer.next(hero);
+        observer.complete();
+      }, 2000);
+    });
+  }
+
+  removeHero(id: string) {
+    return new Observable((observer) => {
+      setTimeout(() => {
+        const heroes = this.heroes.filter((item) => item._id !== id);
+        const current = this.heroesSignal().filter((item) => item._id !== id);
+
+        this.heroesSignal.set(current);
+        this.heroes = heroes;
+        observer.next(heroes);
+        observer.complete();
+      }, 2000);
+    });
+  }
+
+  saveHero(hero: Hero): Observable<Hero> {
+    return new Observable((observer) => {
+      setTimeout(() => {
+        const heroes = this.heroes.map((item) => {
+          if (item._id === hero._id) {
+            item = { ...item, ...hero };
+          }
+          return item;
+        });
+        this.heroes = heroes;
+
+        this.heroesSignal.update((data) => {
+          return data.map((item) => {
+            if (item._id === hero._id) {
+              item = hero;
+            }
+            return item;
+          });
+        });
+
+        observer.next(hero);
+        observer.complete();
+      }, 2000);
+    });
+  }
+
+  addHero(hero: Hero): Observable<Hero> {
+    return new Observable((observer) => {
+      setTimeout(() => {
+        hero._id = uuid();
+        const heroes = this.heroesSignal();
+        heroes.unshift(hero);
+
+        this.heroes.unshift(hero);
+        this.heroesSignal.set(heroes);
+
         observer.next(hero);
         observer.complete();
       }, 1000);

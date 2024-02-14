@@ -1,11 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './_components/header/header.component';
-import { Store } from '@ngrx/store';
-import { fetchHeroes } from './store/superheroes/superheroes.actions';
-import { getSuperHeroesLoading } from './store/superheroes/superheroes.selectors';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { HeroesService } from './_services/heroes.service';
 
 @Component({
   selector: 'app-root',
@@ -20,11 +18,16 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
-  private store = inject(Store);
+  appLoading = computed(() => {
+    return this.heroService.loadingSignal();
+  });
 
-  loadingList$ = this.store.select(getSuperHeroesLoading);
+  heroService = inject(HeroesService);
 
   ngOnInit() {
-    this.store.dispatch(fetchHeroes());
+    this.heroService.setLoading(true);
+    this.heroService.getAllHeroes().subscribe(() => {
+      this.heroService.setLoading(false);
+    });
   }
 }

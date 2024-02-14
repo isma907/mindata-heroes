@@ -16,6 +16,11 @@ interface Biography {
 }
 
 export interface filteredData {
-  heroesList: Hero[];
+  totalItems: number;
   showElements: Hero[];
+}
+
+export enum FILTER_BY {
+  id = '_id',
+  name = 'name',
 }
