@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject } from '@angular/core';
+import { Component, OnInit, computed, effect, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './_components/header/header.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HeroesService } from './_services/heroes.service';
+import { LoadingService } from './_services/loading.service';
 
 @Component({
   selector: 'app-root',
@@ -17,17 +18,22 @@ import { HeroesService } from './_services/heroes.service';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
+  private loadingService = inject(LoadingService);
+
   appLoading = computed(() => {
-    return this.heroesService.loadingSignal();
+    return this.loadingService.loadingSignal();
   });
 
   heroesService = inject(HeroesService);
 
-  ngOnInit() {
-    this.heroesService.setLoading(true);
-    this.heroesService.getAllHeroes().subscribe(() => {
-      this.heroesService.setLoading(false);
-    });
-  }
+  filterChangeEffect = effect(
+    () => {
+      const filters = this.heroesService.searchSignal();
+      this.heroesService.searchHeroes(filters).subscribe((res) => {
+        this.heroesService.setHeroes(res);
+      });
+    },
+    { allowSignalWrites: true }
+  );
 }

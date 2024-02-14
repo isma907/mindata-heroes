@@ -5,13 +5,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
 import { MatSelectModule } from '@angular/material/select';
 import { APP_ROUTES_ENUM } from '../../app.routes';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { HeroesService } from '../../_services/heroes.service';
-import { FILTER_BY } from '../../_interfaces/hero.interface';
+import { filterData } from '../../_interfaces/filter.interface';
+import { LoadingService } from '../../_services/loading.service';
 
 @Component({
   selector: 'mindata-header',
@@ -32,13 +33,14 @@ import { FILTER_BY } from '../../_interfaces/hero.interface';
 export class HeaderComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private heroesService = inject(HeroesService);
+  private loadingService = inject(LoadingService);
   private unsubscribe$: Subject<void> = new Subject<void>();
   appRoute = APP_ROUTES_ENUM;
 
   FilterForm!: FormGroup;
 
   loading = computed<boolean>(() => {
-    return this.heroesService.loadingSignal();
+    return this.loadingService.loadingSignal();
   });
 
   ngOnInit(): void {
@@ -50,14 +52,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   search() {
     const formVal = this.FilterForm.value;
-    this.heroesService.setLoading(true);
-    this.heroesService.setFilter(formVal);
-    this.heroesService
-      .getHeroByField(formVal.filterBy as FILTER_BY, formVal.query)
-      .pipe(takeUntil(this.unsubscribe$))
-      .subscribe(() => {
-        this.heroesService.setLoading(false);
-      });
+
+    const query: filterData = {
+      filterBy: formVal.filterBy,
+      search: formVal.query,
+      page: 1,
+      limit: 24,
+    };
+
+    this.heroesService.searchSignal.set(query);
   }
 
   ngOnDestroy() {

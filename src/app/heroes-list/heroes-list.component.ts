@@ -1,14 +1,5 @@
-import {
-  Component,
-  Injector,
-  OnDestroy,
-  OnInit,
-  computed,
-  effect,
-  inject,
-} from '@angular/core';
-import { Hero, filteredData } from '../_interfaces/hero.interface';
-
+import { Component, OnDestroy, OnInit, computed, inject } from '@angular/core';
+import { Hero } from '../_interfaces/hero.interface';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -20,9 +11,11 @@ import { HeroCardComponent } from '../_components/hero-card/hero-card.component'
 import { Subject, takeUntil } from 'rxjs';
 import { HeaderComponent } from '../_components/header/header.component';
 import { HeroesService } from '../_services/heroes.service';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SnackbarService } from '../_services/snackbar.service';
+import { MatButtonModule } from '@angular/material/button';
+import { LoadingService } from '../_services/loading.service';
 
 @Component({
   selector: 'mindata-heroes-list',
@@ -38,35 +31,33 @@ import { SnackbarService } from '../_services/snackbar.service';
     HeaderComponent,
     MatPaginatorModule,
     MatSnackBarModule,
+    MatButtonModule,
   ],
   templateUrl: './heroes-list.component.html',
   styleUrl: './heroes-list.component.scss',
 })
 export class HeroesListComponent implements OnInit, OnDestroy {
-  constructor(private injector: Injector) {}
   private unsubscribe$: Subject<void> = new Subject<void>();
   private dialog = inject(MatDialog);
-  private heroService = inject(HeroesService);
   private snackbarService = inject(SnackbarService);
+  private heroesService = inject(HeroesService);
+  private loadingService = inject(LoadingService);
 
   ngOnInit(): void {}
 
-  paginatorData = computed(() => {
-    return this.heroService.filterSignal();
+  prevPage() {
+    this.heroesService.goPrevPage();
+  }
+  nextPage() {
+    this.heroesService.goNextPage();
+  }
+
+  loading = computed<boolean>(() => {
+    return this.loadingService.loadingSignal();
   });
 
-  filteredHeroes = computed<filteredData>(() => {
-    const filterData = this.heroService.filterSignal();
-    const allHeroes = this.heroService.heroesSignal();
-    const startIndex = filterData.pageIndex * filterData.pageSize;
-    const endIndex = startIndex + filterData.pageSize;
-    const showData = allHeroes.slice(startIndex, endIndex);
-
-    const res: filteredData = {
-      totalItems: allHeroes.length,
-      showElements: showData,
-    };
-    return res;
+  heroData = computed(() => {
+    return this.heroesService.heroesSignal();
   });
 
   delete(hero: Hero) {
@@ -78,19 +69,13 @@ export class HeroesListComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.unsubscribe$))
       .subscribe((result) => {
         if (result) {
-          this.heroService.setLoading(true);
-          this.heroService.removeHero(hero._id).subscribe(() => {
+          this.heroesService.removeHero(hero._id).subscribe(() => {
             this.snackbarService.showSnackbar(
               `${hero.name} eliminado correctamente`
             );
-            this.heroService.setLoading(false);
           });
         }
       });
-  }
-
-  changePage(event: PageEvent) {
-    this.heroService.setPaginator(event);
   }
 
   ngOnDestroy() {

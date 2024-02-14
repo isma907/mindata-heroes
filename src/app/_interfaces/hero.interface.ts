@@ -1,26 +1,23 @@
+export interface SuperHeroApiResponse extends PaginationInfo {
+  data: Hero[];
+}
+
+export interface PaginationInfo {
+  totalResults?: number;
+  currentPage?: number;
+  totalPages?: number;
+  prevPage?: number;
+  nextPage?: number;
+}
 export interface SuperHeroState {
   list: Hero[];
   loading: boolean;
 }
 
 export interface Hero {
-  name: string;
-  biography: Biography;
-  imageUrl: string;
   _id: string;
-}
-
-interface Biography {
+  name: string;
+  imageUrl: string;
   firstAppearance: string;
   publisher: string;
-}
-
-export interface filteredData {
-  totalItems: number;
-  showElements: Hero[];
-}
-
-export enum FILTER_BY {
-  id = '_id',
-  name = 'name',
 }
