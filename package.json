@@ -8,7 +8,7 @@
     "buildprod": "ng build --configuration production",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "mockAPI": "json-server --watch superheroes.json"
+    "localProd": "ng serve --configuration production"
   },
   "private": true,
   "dependencies": {
