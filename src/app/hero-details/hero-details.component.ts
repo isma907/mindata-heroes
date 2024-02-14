@@ -14,10 +14,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Hero } from '../_interfaces/hero.interface';
-import { ActivatedRoute } from '@angular/router';
-import { Subject, take } from 'rxjs';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { Subject, takeUntil } from 'rxjs';
 import { HeroesService } from '../_services/heroes.service';
 import { SnackbarService } from '../_services/snackbar.service';
+import { APP_ROUTES_ENUM } from '../app.routes';
 
 @Component({
   selector: 'mindata-hero-details',
@@ -30,6 +31,7 @@ import { SnackbarService } from '../_services/snackbar.service';
     MatFormFieldModule,
     ReactiveFormsModule,
     MatButtonModule,
+    RouterModule,
   ],
   templateUrl: './hero-details.component.html',
   styleUrl: './hero-details.component.scss',
@@ -40,6 +42,7 @@ export class HeroDetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private heroService = inject(HeroesService);
   private snackbarService = inject(SnackbarService);
+  appRoute = APP_ROUTES_ENUM;
 
   formHero!: FormGroup;
   _id: string | null = null;
@@ -57,10 +60,13 @@ export class HeroDetailsComponent implements OnInit {
       this._id = params.get('id');
       if (this._id) {
         this.heroService.setLoading(true);
-        this.heroService.getHeroById(this._id).subscribe((hero: Hero) => {
-          this.heroService.setLoading(false);
-          if (hero) this.formHero.setValue(hero);
-        });
+        this.heroService
+          .getHeroById(this._id)
+          .pipe(takeUntil(this.unsubscribe$))
+          .subscribe((hero: Hero) => {
+            this.heroService.setLoading(false);
+            if (hero) this.formHero.setValue(hero);
+          });
       }
     });
   }
@@ -73,7 +79,7 @@ export class HeroDetailsComponent implements OnInit {
         ? this.heroService.saveHero(heroData)
         : this.heroService.addHero(heroData);
 
-      saveEndpoint.pipe(take(1)).subscribe((hero) => {
+      saveEndpoint.pipe(takeUntil(this.unsubscribe$)).subscribe((hero) => {
         this.snackbarService.showSnackbar(
           `${hero.name} guardado correctamente`
         );

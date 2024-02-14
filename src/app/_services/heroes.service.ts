@@ -50,10 +50,6 @@ export class HeroesService {
     });
   }
 
-  setLoading(enable: boolean) {
-    this.loadingSignal.set(enable);
-  }
-
   getAllHeroes(): Observable<Hero[]> {
     return this.http.get<Hero[]>(this.heroesEndpoint).pipe(
       delay(1000),
@@ -107,26 +103,25 @@ export class HeroesService {
   saveHero(hero: Hero): Observable<Hero> {
     return new Observable((observer) => {
       setTimeout(() => {
-        const heroes = this.heroes.map((item) => {
-          if (item._id === hero._id) {
-            item = { ...item, ...hero };
-          }
-          return item;
-        });
-        this.heroes = heroes;
+        const updatedHeroes = this.updateHeroInArray(this.heroes, hero);
+        this.heroes = updatedHeroes;
 
         this.heroesSignal.update((data) => {
-          return data.map((item) => {
-            if (item._id === hero._id) {
-              item = hero;
-            }
-            return item;
-          });
+          return this.updateHeroInArray(data, hero);
         });
 
         observer.next(hero);
         observer.complete();
       }, 2000);
+    });
+  }
+
+  updateHeroInArray(array: Hero[], heroToUpdate: Hero) {
+    return array.map((item) => {
+      if (item._id === heroToUpdate._id) {
+        return { ...item, ...heroToUpdate };
+      }
+      return item;
     });
   }
 
@@ -144,5 +139,9 @@ export class HeroesService {
         observer.complete();
       }, 1000);
     });
+  }
+
+  setLoading(enable: boolean) {
+    this.loadingSignal.set(enable);
   }
 }

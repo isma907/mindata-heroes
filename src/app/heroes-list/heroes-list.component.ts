@@ -44,10 +44,6 @@ export class HeroesListComponent implements OnDestroy {
     return this.heroService.filterSignal();
   });
 
-  allHeroes = computed(() => {
-    return this.heroService.heroesSignal();
-  });
-
   filteredHeroes = computed<filteredData>(() => {
     const filterData = this.heroService.filterSignal();
     const allHeroes = this.heroService.heroesSignal();

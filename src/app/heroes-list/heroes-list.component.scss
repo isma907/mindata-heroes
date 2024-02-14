@@ -11,4 +11,11 @@
         padding: 20px;
         align-items: stretch;
     }
+
+    .hero-list-paginator {
+        position: sticky;
+        bottom: 20px;
+        background: #ffe600;
+        z-index: 10;
+    }
 }

@@ -74,7 +74,15 @@
       </div>
     </mat-card-content>
     <mat-card-actions align="end">
-      <button mat-button [disabled]="formHero.invalid" (click)="saveHero()">
+      <a mat-button [routerLink]="appRoute.HOMEPAGE"> Volver </a>
+
+      <button
+        mat-button
+        mat-raised-button
+        color="primary"
+        [disabled]="formHero.invalid"
+        (click)="saveHero()"
+      >
         Guardar
       </button>
     </mat-card-actions>

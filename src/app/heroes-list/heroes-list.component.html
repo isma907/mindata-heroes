@@ -1,11 +1,4 @@
 <div class="hero-list-wrapper">
-  <mat-paginator
-    [length]="filteredHeroes().totalItems"
-    [pageSize]="paginatorData().pageSize"
-    [pageSizeOptions]="paginatorData().pageSizeOptions"
-    (page)="changePage($event)"
-  ></mat-paginator>
-
   <section class="hero-list-wrapper-grid">
     @for (hero of filteredHeroes().showElements; track hero._id) {
     <mindata-hero-card
@@ -14,4 +7,12 @@
     ></mindata-hero-card>
     }
   </section>
+
+  <mat-paginator
+    class="hero-list-paginator"
+    [length]="filteredHeroes().totalItems"
+    [pageSize]="paginatorData().pageSize"
+    [pageSizeOptions]="paginatorData().pageSizeOptions"
+    (page)="changePage($event)"
+  ></mat-paginator>
 </div>
