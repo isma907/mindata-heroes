@@ -53,7 +53,7 @@ export class HeroesListComponent implements OnInit, OnDestroy {
   }
 
   get heroData() {
-    return this.heroesService.heroSignal;
+    return this.heroesService.getHeroSignal;
   }
 
   get loading() {
@@ -61,7 +61,7 @@ export class HeroesListComponent implements OnInit, OnDestroy {
   }
 
   get paginationData() {
-    return this.heroesService.getPaginationData;
+    return this.heroesService.paginationInfo;
   }
 
   delete(hero: Hero) {

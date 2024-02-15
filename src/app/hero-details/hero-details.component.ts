@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject } from '@angular/core';
+import { Component, OnInit, effect, inject } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -53,9 +53,17 @@ export class HeroDetailsComponent implements OnInit {
   formHero!: FormGroup;
   _id: string | null = null;
 
-  loading = computed<boolean>(() => {
-    return this.loadingService.loadingSignal();
-  });
+  get loading() {
+    return this.loadingService.loading;
+  }
+
+  filterChangeEffect = effect(
+    () => {
+      const filters = this.heroesService.heroesDB();
+      console.log('READY');
+    },
+    { allowSignalWrites: true }
+  );
 
   ngOnInit() {
     this.formHero = this.fb.group({
@@ -75,8 +83,7 @@ export class HeroDetailsComponent implements OnInit {
             .getHeroById(this._id)
             .pipe(
               takeUntil(this.unsubscribe$),
-              catchError((error) => {
-                console.log(error);
+              catchError(() => {
                 return of(EMPTY);
               })
             )
@@ -92,16 +99,18 @@ export class HeroDetailsComponent implements OnInit {
   saveHero() {
     if (this.formHero.valid) {
       const heroData: Hero = this.formHero.value;
-      const saveEndpoint = this._id
-        ? this.heroesService.saveHero(heroData)
-        : this.heroesService.createHero(heroData);
+      const addOrUpdate = this._id
+        ? this.heroesService.updateHero.bind(this.heroesService)
+        : this.heroesService.addHero.bind(this.heroesService);
 
-      saveEndpoint.pipe(takeUntil(this.unsubscribe$)).subscribe((hero) => {
-        this.snackbarService.showSnackbar(
-          `${heroData.name} guardado correctamente`
-        );
-        this.router.navigate([APP_ROUTES_ENUM.EDIT_HERO + '/' + hero._id]);
-      });
+      addOrUpdate(heroData)
+        .pipe(takeUntil(this.unsubscribe$))
+        .subscribe((hero) => {
+          this.snackbarService.showSnackbar(
+            `${heroData.name} guardado correctamente`
+          );
+          this.router.navigate([APP_ROUTES_ENUM.EDIT_HERO + '/' + hero._id]);
+        });
     }
   }
 

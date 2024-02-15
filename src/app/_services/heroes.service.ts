@@ -1,26 +1,26 @@
-import { Injectable, inject, signal } from '@angular/core';
-import {
-  Hero,
-  PaginationInfo,
-  SuperHeroApiResponse,
-} from '../_interfaces/hero.interface';
+import { Injectable, computed, inject, signal } from '@angular/core';
+import { Hero } from '../_interfaces/hero.interface';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { FILTER_BY, filterData } from '../_interfaces/filter.interface';
 import { environment } from '../../environments/environment';
+import { v4 as uuid } from 'uuid';
+import { SnackbarService } from './snackbar.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HeroesService {
   http = inject(HttpClient);
+  private snackbarService = inject(SnackbarService);
+
   private heroesEndpoint = `${environment.apiURL}`;
 
-  heroesSignal = signal<SuperHeroApiResponse>({
-    currentPage: 1,
-    totalResults: undefined,
-    data: [],
-  });
+  /**
+ Se carga la lista entera una vez que se hace GET por primera vez del archivo JSON 
+ luego se filtra dentro de la app
+  */
+  heroesDB = signal<Hero[]>([]);
 
   searchSignal = signal<filterData>({
     filterBy: FILTER_BY.name,
@@ -29,91 +29,117 @@ export class HeroesService {
     search: '',
   });
 
-  get heroSignal() {
+  heroesSignal = computed(() => {
+    const filteredData = this.heroesDB();
+    const searchSignal = this.searchSignal();
+    const filteredList = this.filterHeroes(filteredData, searchSignal);
+
+    const startIndex = (searchSignal.page - 1) * searchSignal.limit;
+    const endIndex = startIndex + searchSignal.limit;
+    const paginatedList = filteredList.slice(startIndex, endIndex);
+
+    return paginatedList;
+  });
+
+  paginationInfoSignal = computed(() => {
+    const filteredData = this.heroesDB();
+    const searchSignal = this.searchSignal();
+    const filteredList = this.filterHeroes(filteredData, searchSignal);
+
+    const totalResults = filteredList.length;
+    const totalPages = Math.ceil(totalResults / searchSignal.limit);
+    const currentPage = searchSignal.page;
+    const prevPage = currentPage > 1 ? currentPage - 1 : null;
+    const nextPage = currentPage < totalPages ? currentPage + 1 : null;
+
+    return {
+      totalResults,
+      currentPage,
+      totalPages,
+      prevPage,
+      nextPage,
+    };
+  });
+
+  get paginationInfo() {
+    return this.paginationInfoSignal();
+  }
+
+  get getHeroSignal() {
     return this.heroesSignal();
   }
 
-  get getPaginationData() {
-    const heroSignal = this.heroesSignal();
-    const paginationData: PaginationInfo = {
-      totalResults: heroSignal.totalResults,
-      currentPage: heroSignal.currentPage,
-      totalPages: heroSignal.totalPages,
-      prevPage: heroSignal.prevPage,
-      nextPage: heroSignal.nextPage,
-    };
-    return paginationData;
-  }
-
-  searchHeroes(filter: filterData): Observable<SuperHeroApiResponse> {
-    const query = `?search=${filter.search ?? ''}&filterBy=${
-      filter.filterBy ?? 'name'
-    }&page=${filter.page ?? 1}&limit=${filter.limit ?? 1}`;
-    const fullURL = `${this.heroesEndpoint}${query}`;
-    return this.http.get<SuperHeroApiResponse>(fullURL).pipe(
+  getHeroesDB(): Observable<Hero[]> {
+    return this.http.get<Hero[]>(this.heroesEndpoint).pipe(
       tap((res) => {
-        this.heroesSignal.set(res);
+        this.heroesDB.set(res);
         return res;
       })
     );
   }
 
-  getHeroById(id: string): Observable<Hero> {
-    return this.http.get<Hero>(`${this.heroesEndpoint}/getHeroById/${id}`);
+  getHeroById(_id: string): Observable<Hero> {
+    return new Observable<Hero>((observer) => {
+      const hero = this.heroesDB().find((hero) => hero._id === _id);
+      setTimeout(() => {
+        observer.next(hero);
+        observer.complete();
+      });
+    });
   }
 
-  removeHero(id: string) {
-    return this.http
-      .delete<Hero>(`${this.heroesEndpoint}/deleteHero/${id}`)
-      .pipe(
-        tap(() => {
-          this.heroesSignal.update((store) => {
-            store.totalResults = store.totalResults
-              ? store.totalResults - 1
-              : 0;
-            const testData = store.data.filter((item) => {
-              return item._id != id;
-            });
-            store.data = testData;
-            return store;
-          });
-        })
-      );
-  }
+  removeHero(id: string): Observable<Hero> {
+    return new Observable<Hero>((observer) => {
+      const heroToRemove = this.heroesDB().find((hero) => hero._id === id);
+      if (!heroToRemove) {
+        observer.error(`Hero with id ${id} not found`);
+        return;
+      }
 
-  saveHero(hero: Hero): Observable<Hero> {
-    return this.http.put<Hero>(`${this.heroesEndpoint}/update`, hero).pipe(
-      tap((hero) => {
-        this.heroesSignal.update((store) => {
-          store.data = store.data.map((item) => {
-            if (item._id === hero._id) {
-              return hero;
-            }
-            return item;
-          });
-
-          return store;
+      setTimeout(() => {
+        this.heroesDB.update((store) => {
+          return store.filter((item) => item._id !== id);
         });
-      })
-    );
+        observer.next(heroToRemove);
+        observer.complete();
+      });
+    });
   }
 
-  createHero(hero: Hero): Observable<Hero> {
-    return this.http.post<Hero>(`${this.heroesEndpoint}/add`, hero).pipe(
-      tap((res) => {
-        this.heroesSignal().data.unshift(res);
-        this.heroesSignal.update((store) => {
-          store.totalResults = store.totalResults ? store.totalResults + 1 : 0;
-          return store;
+  addHero(hero: Hero): Observable<Hero> {
+    return new Observable((observer) => {
+      setTimeout(() => {
+        if (this.allowedToAdd(hero, true)) {
+          this.snackbarService.showSnackbar(
+            'Ya existe un Hero con este nombre'
+          );
+        } else {
+          const newHero = { ...hero, _id: uuid() };
+          this.heroesDB.update((heroes) => {
+            return [newHero, ...heroes];
+          });
+          observer.next(newHero);
+          observer.complete();
+        }
+      }, 2000);
+    });
+  }
+
+  updateHero(hero: Hero): Observable<Hero> {
+    return new Observable<Hero>((observer) => {
+      if (this.allowedToAdd(hero, false)) {
+        this.snackbarService.showSnackbar('Ya existe un Hero con este nombre');
+      } else {
+        this.heroesDB.update((heroes) => {
+          const index = heroes.findIndex((item) => item._id === hero._id);
+          if (index !== -1) {
+            heroes[index] = hero;
+          }
+          return [...heroes];
         });
-      })
-    );
-  }
-
-  setHeroes(heroes: SuperHeroApiResponse) {
-    this.heroesSignal.update((store) => {
-      store.data = heroes.data;
-      return store;
+        observer.next(hero);
+        observer.complete();
+      }
     });
   }
 
@@ -125,5 +151,39 @@ export class HeroesService {
   goPrevPage() {
     const data = this.searchSignal();
     this.searchSignal.set({ ...data, page: data.page - 1 });
+  }
+
+  private allowedToAdd(hero: Hero, isInsertion: boolean) {
+    const heroList = this.heroesDB();
+    const loweredCaseName = hero.name.toLowerCase();
+
+    if (isInsertion) {
+      const exists = heroList.some(
+        (item) => item.name.toLowerCase() === loweredCaseName
+      );
+      return exists;
+    } else {
+      const exists = heroList.some(
+        (item) =>
+          item.name.toLowerCase() === loweredCaseName && item._id !== hero._id
+      );
+      return exists;
+    }
+  }
+
+  private filterHeroes(filteredData: Hero[], searchSignal: filterData) {
+    const filterBy = searchSignal.filterBy;
+    let filteredList = filteredData;
+
+    if (filterBy && searchSignal.search) {
+      const searchTerm = searchSignal.search.toLowerCase();
+      filteredList = filteredData.filter((hero: Hero) =>
+        hero[filterBy as keyof Hero]
+          .toLowerCase()
+          .includes(searchTerm.toLocaleLowerCase())
+      );
+    }
+
+    return filteredList;
   }
 }

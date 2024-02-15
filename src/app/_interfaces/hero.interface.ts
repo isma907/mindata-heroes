@@ -11,7 +11,6 @@ export interface PaginationInfo {
 }
 export interface SuperHeroState {
   list: Hero[];
-  loading: boolean;
 }
 
 export interface Hero {
