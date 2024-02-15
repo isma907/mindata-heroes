@@ -4,7 +4,6 @@ import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './_components/header/header.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HeroesService } from './_services/heroes.service';
-import { LoadingService } from './_services/loading.service';
 import { take } from 'rxjs';
 
 @Component({
@@ -20,12 +19,10 @@ import { take } from 'rxjs';
   styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
-  private loadingService = inject(LoadingService);
+  private heroesService = inject(HeroesService);
   get loading() {
-    return this.loadingService.loading;
+    return this.heroesService.loading;
   }
-
-  heroesService = inject(HeroesService);
 
   ngOnInit(): void {
     this.heroesService.getHeroesDB().pipe(take(1)).subscribe();

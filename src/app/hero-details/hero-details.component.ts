@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, effect, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -20,7 +20,6 @@ import { HeroesService } from '../_services/heroes.service';
 import { SnackbarService } from '../_services/snackbar.service';
 import { APP_ROUTES_ENUM } from '../app.routes';
 import { UpperCaseDirective } from '../_directives/upper-case.directive';
-import { LoadingService } from '../_services/loading.service';
 
 @Component({
   selector: 'mindata-hero-details',
@@ -45,7 +44,6 @@ export class HeroDetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private heroesService = inject(HeroesService);
   private snackbarService = inject(SnackbarService);
-  private loadingService = inject(LoadingService);
   private router = inject(Router);
 
   appRoute = APP_ROUTES_ENUM;
@@ -54,16 +52,8 @@ export class HeroDetailsComponent implements OnInit {
   _id: string | null = null;
 
   get loading() {
-    return this.loadingService.loading;
+    return this.heroesService.loading;
   }
-
-  filterChangeEffect = effect(
-    () => {
-      const filters = this.heroesService.heroesDB();
-      console.log('READY');
-    },
-    { allowSignalWrites: true }
-  );
 
   ngOnInit() {
     this.formHero = this.fb.group({

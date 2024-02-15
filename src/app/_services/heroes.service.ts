@@ -1,7 +1,7 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Hero } from '../_interfaces/hero.interface';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, finalize, tap } from 'rxjs';
 import { FILTER_BY, filterData } from '../_interfaces/filter.interface';
 import { environment } from '../../environments/environment';
 import { v4 as uuid } from 'uuid';
@@ -13,7 +13,6 @@ import { SnackbarService } from './snackbar.service';
 export class HeroesService {
   http = inject(HttpClient);
   private snackbarService = inject(SnackbarService);
-
   private heroesEndpoint = `${environment.apiURL}`;
 
   /**
@@ -28,6 +27,15 @@ export class HeroesService {
     page: 1,
     search: '',
   });
+
+  loadingSignal = signal<boolean>(false);
+  setLoading(enable: boolean) {
+    this.loadingSignal.set(enable);
+  }
+
+  get loading() {
+    return this.loadingSignal();
+  }
 
   heroesSignal = computed(() => {
     const filteredData = this.heroesDB();
@@ -79,16 +87,22 @@ export class HeroesService {
   }
 
   getHeroById(_id: string): Observable<Hero> {
+    this.setLoading(true);
     return new Observable<Hero>((observer) => {
       const hero = this.heroesDB().find((hero) => hero._id === _id);
       setTimeout(() => {
         observer.next(hero);
         observer.complete();
-      });
-    });
+      }, 1200);
+    }).pipe(
+      finalize(() => {
+        this.setLoading(false);
+      })
+    );
   }
 
   removeHero(id: string): Observable<Hero> {
+    this.setLoading(true);
     return new Observable<Hero>((observer) => {
       const heroToRemove = this.heroesDB().find((hero) => hero._id === id);
       if (!heroToRemove) {
@@ -102,17 +116,22 @@ export class HeroesService {
         });
         observer.next(heroToRemove);
         observer.complete();
-      });
-    });
+      }, 1200);
+    }).pipe(
+      finalize(() => {
+        this.setLoading(false);
+      })
+    );
   }
 
   addHero(hero: Hero): Observable<Hero> {
-    return new Observable((observer) => {
+    this.setLoading(true);
+    return new Observable<Hero>((observer) => {
       setTimeout(() => {
         if (this.allowedToAdd(hero, true)) {
-          this.snackbarService.showSnackbar(
-            'Ya existe un Hero con este nombre'
-          );
+          const msg = 'Ya existe un Hero con este nombre';
+          this.snackbarService.showSnackbar(msg);
+          observer.error(msg);
         } else {
           const newHero = { ...hero, _id: uuid() };
           this.heroesDB.update((heroes) => {
@@ -121,26 +140,38 @@ export class HeroesService {
           observer.next(newHero);
           observer.complete();
         }
-      }, 2000);
-    });
+      }, 1200);
+    }).pipe(
+      finalize(() => {
+        this.setLoading(false);
+      })
+    );
   }
-
   updateHero(hero: Hero): Observable<Hero> {
+    this.setLoading(true);
     return new Observable<Hero>((observer) => {
-      if (this.allowedToAdd(hero, false)) {
-        this.snackbarService.showSnackbar('Ya existe un Hero con este nombre');
-      } else {
-        this.heroesDB.update((heroes) => {
-          const index = heroes.findIndex((item) => item._id === hero._id);
-          if (index !== -1) {
-            heroes[index] = hero;
-          }
-          return [...heroes];
-        });
-        observer.next(hero);
-        observer.complete();
-      }
-    });
+      setTimeout(() => {
+        if (this.allowedToAdd(hero, false)) {
+          const msg = 'Ya existe un Hero con este nombre';
+          this.snackbarService.showSnackbar(msg);
+          observer.error(msg);
+        } else {
+          this.heroesDB.update((heroes) => {
+            const index = heroes.findIndex((item) => item._id === hero._id);
+            if (index !== -1) {
+              heroes[index] = hero;
+            }
+            return [...heroes];
+          });
+          observer.next(hero);
+          observer.complete();
+        }
+      }, 1200);
+    }).pipe(
+      finalize(() => {
+        this.setLoading(false);
+      })
+    );
   }
 
   goNextPage() {

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, computed, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 import { MatInputModule } from '@angular/material/input';
@@ -12,7 +12,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { HeroesService } from '../../_services/heroes.service';
 import { filterData } from '../../_interfaces/filter.interface';
-import { LoadingService } from '../../_services/loading.service';
 
 @Component({
   selector: 'mindata-header',
@@ -33,14 +32,13 @@ import { LoadingService } from '../../_services/loading.service';
 export class HeaderComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private heroesService = inject(HeroesService);
-  private loadingService = inject(LoadingService);
   private unsubscribe$: Subject<void> = new Subject<void>();
   appRoute = APP_ROUTES_ENUM;
 
   FilterForm!: FormGroup;
 
   get loading() {
-    return this.loadingService.loading;
+    return this.heroesService.loading;
   }
 
   ngOnInit(): void {
@@ -52,15 +50,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   search() {
     const formVal = this.FilterForm.value;
-
     const query: filterData = {
       filterBy: formVal.filterBy,
       search: formVal.query,
+      limit: this.heroesService.searchSignal().limit,
       page: 1,
-      limit: 24,
     };
+    this.heroesService.searchSignal.update((data) => {
+      return { data, ...query };
+    });
+  }
 
-    this.heroesService.searchSignal.set(query);
+  resetQuery() {
+    this.FilterForm.patchValue({ query: '' });
   }
 
   ngOnDestroy() {
