@@ -1,6 +1,6 @@
 # MindataHeroes
 
-https://isma907.github.io/mindata-heroes-preview/
+https://isma907.github.io/mindata-heroes/
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.1.0.
 
