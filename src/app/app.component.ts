@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, effect, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './_components/header/header.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -23,9 +23,9 @@ export class AppComponent {
   private loadingService = inject(LoadingService);
   private unsubscribe$: Subject<void> = new Subject<void>();
 
-  appLoading = computed(() => {
-    return this.loadingService.loadingSignal();
-  });
+  get loading() {
+    return this.loadingService.loading;
+  }
 
   heroesService = inject(HeroesService);
 

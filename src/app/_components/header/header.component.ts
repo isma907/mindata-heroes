@@ -39,9 +39,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   FilterForm!: FormGroup;
 
-  loading = computed<boolean>(() => {
-    return this.loadingService.loadingSignal();
-  });
+  get loading() {
+    return this.loadingService.loading;
+  }
 
   ngOnInit(): void {
     this.FilterForm = this.fb.group({

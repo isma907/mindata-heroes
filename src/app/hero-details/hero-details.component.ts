@@ -15,7 +15,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { Hero } from '../_interfaces/hero.interface';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Subject, takeUntil } from 'rxjs';
+import { EMPTY, Subject, catchError, of, takeUntil } from 'rxjs';
 import { HeroesService } from '../_services/heroes.service';
 import { SnackbarService } from '../_services/snackbar.service';
 import { APP_ROUTES_ENUM } from '../app.routes';
@@ -73,9 +73,17 @@ export class HeroDetailsComponent implements OnInit {
         if (this._id) {
           this.heroesService
             .getHeroById(this._id)
-            .pipe(takeUntil(this.unsubscribe$))
+            .pipe(
+              takeUntil(this.unsubscribe$),
+              catchError((error) => {
+                console.log(error);
+                return of(EMPTY);
+              })
+            )
             .subscribe((data) => {
-              this.formHero.setValue(data);
+              if (data) {
+                this.formHero.setValue(data);
+              }
             });
         }
       });
@@ -90,7 +98,7 @@ export class HeroDetailsComponent implements OnInit {
 
       saveEndpoint.pipe(takeUntil(this.unsubscribe$)).subscribe((hero) => {
         this.snackbarService.showSnackbar(
-          `${hero.name} guardado correctamente`
+          `${heroData.name} guardado correctamente`
         );
         this.router.navigate([APP_ROUTES_ENUM.EDIT_HERO + '/' + hero._id]);
       });

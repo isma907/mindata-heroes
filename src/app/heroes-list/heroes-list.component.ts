@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, computed, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Hero } from '../_interfaces/hero.interface';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -52,13 +52,17 @@ export class HeroesListComponent implements OnInit, OnDestroy {
     this.heroesService.goNextPage();
   }
 
-  loading = computed<boolean>(() => {
-    return this.loadingService.loadingSignal();
-  });
+  get heroData() {
+    return this.heroesService.heroSignal;
+  }
 
-  heroData = computed(() => {
-    return this.heroesService.heroesSignal();
-  });
+  get loading() {
+    return this.loadingService.loading;
+  }
+
+  get paginationData() {
+    return this.heroesService.getPaginationData;
+  }
 
   delete(hero: Hero) {
     const dialogRef = this.dialog.open(DeleteConfirmationComponent, {

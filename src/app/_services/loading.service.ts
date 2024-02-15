@@ -8,4 +8,8 @@ export class LoadingService {
   setLoading(enable: boolean) {
     this.loadingSignal.set(enable);
   }
+
+  get loading() {
+    return this.loadingSignal();
+  }
 }

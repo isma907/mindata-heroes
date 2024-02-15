@@ -12,14 +12,40 @@
         align-items: stretch;
     }
 
+    .hero-list-item {
+        ::ng-deep .mdc-card__media {
+            max-height: 270px;
+            object-fit: cover;
+            width: 100%;
+        }
+    }
+
     .hero-list-paginator {
-        position: sticky;
+        position: fixed;
         bottom: 20px;
         background: #ffe600;
         z-index: 10;
         padding: 10px;
         display: flex;
         justify-content: end;
+        align-items: center;
         gap: 10px;
+        width: 80%;
+        left: auto;
+        right: auto;
+
+        .totalResults {
+            font-weight: bold;
+        }
+
+        .currentPage {
+            display: flex;
+            width: 30px;
+            height: 30px;
+            justify-content: center;
+            align-items: center;
+            background: #fff;
+            border-radius: 50%;
+        }
     }
 }
