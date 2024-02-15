@@ -7,16 +7,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Installation
 
-download to separate folders
-
 https://github.com/isma907/mindata-heroes
 
-https://github.com/isma907/SuperheroesAPI
+run `npm install`
 
-run in both folders `npm install`
-
-run in both folders `npm start`
-
-## Run locally without mocked API
-
-`npm run localProd` (just in Angular folder)
+run `npm start`
