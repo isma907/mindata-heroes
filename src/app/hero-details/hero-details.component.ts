@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -20,7 +20,6 @@ import { HeroesService } from '../_services/heroes.service';
 import { SnackbarService } from '../_services/snackbar.service';
 import { APP_ROUTES_ENUM } from '../app.routes';
 import { UpperCaseDirective } from '../_directives/upper-case.directive';
-import { LoadingService } from '../_services/loading.service';
 
 @Component({
   selector: 'mindata-hero-details',
@@ -45,7 +44,6 @@ export class HeroDetailsComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private heroesService = inject(HeroesService);
   private snackbarService = inject(SnackbarService);
-  private loadingService = inject(LoadingService);
   private router = inject(Router);
 
   appRoute = APP_ROUTES_ENUM;
@@ -53,9 +51,9 @@ export class HeroDetailsComponent implements OnInit {
   formHero!: FormGroup;
   _id: string | null = null;
 
-  loading = computed<boolean>(() => {
-    return this.loadingService.loadingSignal();
-  });
+  get loading() {
+    return this.heroesService.loading;
+  }
 
   ngOnInit() {
     this.formHero = this.fb.group({
@@ -75,8 +73,7 @@ export class HeroDetailsComponent implements OnInit {
             .getHeroById(this._id)
             .pipe(
               takeUntil(this.unsubscribe$),
-              catchError((error) => {
-                console.log(error);
+              catchError(() => {
                 return of(EMPTY);
               })
             )
@@ -92,16 +89,18 @@ export class HeroDetailsComponent implements OnInit {
   saveHero() {
     if (this.formHero.valid) {
       const heroData: Hero = this.formHero.value;
-      const saveEndpoint = this._id
-        ? this.heroesService.saveHero(heroData)
-        : this.heroesService.createHero(heroData);
+      const addOrUpdate = this._id
+        ? this.heroesService.updateHero.bind(this.heroesService)
+        : this.heroesService.addHero.bind(this.heroesService);
 
-      saveEndpoint.pipe(takeUntil(this.unsubscribe$)).subscribe((hero) => {
-        this.snackbarService.showSnackbar(
-          `${heroData.name} guardado correctamente`
-        );
-        this.router.navigate([APP_ROUTES_ENUM.EDIT_HERO + '/' + hero._id]);
-      });
+      addOrUpdate(heroData)
+        .pipe(takeUntil(this.unsubscribe$))
+        .subscribe((hero) => {
+          this.snackbarService.showSnackbar(
+            `${heroData.name} guardado correctamente`
+          );
+          this.router.navigate([APP_ROUTES_ENUM.EDIT_HERO + '/' + hero._id]);
+        });
     }
   }
 

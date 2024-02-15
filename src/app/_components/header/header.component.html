@@ -16,6 +16,19 @@
         formControlName="query"
         type="text"
       />
+
+      @if (FilterForm.value.query) {
+      <button
+        matSuffix
+        mat-icon-button
+        aria-label="Clear"
+        (click)="resetQuery()"
+      >
+        <mat-icon>
+          <span class="material-symbols-outlined"> close </span>
+        </mat-icon>
+      </button>
+      }
     </mat-form-field>
   </form>
 

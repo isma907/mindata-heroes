@@ -15,7 +15,6 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SnackbarService } from '../_services/snackbar.service';
 import { MatButtonModule } from '@angular/material/button';
-import { LoadingService } from '../_services/loading.service';
 
 @Component({
   selector: 'mindata-heroes-list',
@@ -41,7 +40,6 @@ export class HeroesListComponent implements OnInit, OnDestroy {
   private dialog = inject(MatDialog);
   private snackbarService = inject(SnackbarService);
   private heroesService = inject(HeroesService);
-  private loadingService = inject(LoadingService);
 
   ngOnInit(): void {}
 
@@ -53,15 +51,15 @@ export class HeroesListComponent implements OnInit, OnDestroy {
   }
 
   get heroData() {
-    return this.heroesService.heroSignal;
+    return this.heroesService.getHeroSignal;
   }
 
   get loading() {
-    return this.loadingService.loading;
+    return this.heroesService.loading;
   }
 
   get paginationData() {
-    return this.heroesService.getPaginationData;
+    return this.heroesService.paginationInfo;
   }
 
   delete(hero: Hero) {
