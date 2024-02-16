@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -38,7 +38,7 @@ import { UpperCaseDirective } from '../_directives/upper-case.directive';
   templateUrl: './hero-details.component.html',
   styleUrl: './hero-details.component.scss',
 })
-export class HeroDetailsComponent implements OnInit {
+export class HeroDetailsComponent implements OnInit, OnDestroy {
   private unsubscribe$: Subject<void> = new Subject<void>();
   private fb = inject(FormBuilder);
   private route = inject(ActivatedRoute);
@@ -111,7 +111,7 @@ export class HeroDetailsComponent implements OnInit {
 }
 
 export function imageUrlValidator(): ValidatorFn {
-  return (control: AbstractControl): { [key: string]: any } | null => {
+  return (control: AbstractControl): { [key: string]: boolean } | null => {
     const urlPattern = /^(http|https):\/\/[^ "]+$/;
 
     if (control.value && !urlPattern.test(control.value)) {

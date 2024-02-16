@@ -7,7 +7,7 @@ import { HeroesService } from './_services/heroes.service';
 import { take } from 'rxjs';
 
 @Component({
-  selector: 'app-root',
+  selector: 'mindata-app-root',
   standalone: true,
   imports: [
     RouterOutlet,

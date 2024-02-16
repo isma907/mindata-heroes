@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { Hero } from '../_interfaces/hero.interface';
 import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
@@ -35,13 +35,11 @@ import { MatButtonModule } from '@angular/material/button';
   templateUrl: './heroes-list.component.html',
   styleUrl: './heroes-list.component.scss',
 })
-export class HeroesListComponent implements OnInit, OnDestroy {
+export class HeroesListComponent implements OnDestroy {
   private unsubscribe$: Subject<void> = new Subject<void>();
   private dialog = inject(MatDialog);
   private snackbarService = inject(SnackbarService);
   private heroesService = inject(HeroesService);
-
-  ngOnInit(): void {}
 
   prevPage() {
     this.heroesService.goPrevPage();

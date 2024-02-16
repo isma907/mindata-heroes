@@ -8,7 +8,7 @@ import { NgControl } from '@angular/forms';
 export class UpperCaseDirective {
   constructor(private ngControl: NgControl) {}
 
-  @HostListener('input', ['$event']) onInput(event: Event) {
+  @HostListener('input', ['$event']) onInput() {
     const value = this.ngControl.value;
     if (typeof value === 'string') {
       const upperCaseValue = value.toUpperCase();

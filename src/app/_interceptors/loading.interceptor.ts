@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import {
   HttpEvent,
   HttpHandlerFn,
@@ -24,7 +25,7 @@ export const loadingInterceptor: HttpInterceptorFn = (
     finalize(() => {
       heroesService.setLoading(false);
     }),
-    catchError((error) => {
+    catchError(() => {
       snackbarService.showSnackbar('Oops, algo no salió bien');
       return EMPTY;
     })
