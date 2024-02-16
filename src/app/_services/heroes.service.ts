@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Hero } from '../_interfaces/hero.interface';
+import { Hero, PaginationInfo } from '../_interfaces/hero.interface';
 import { HttpClient } from '@angular/common/http';
 import { Observable, finalize, tap } from 'rxjs';
 import { FILTER_BY, filterData } from '../_interfaces/filter.interface';
@@ -37,7 +37,7 @@ export class HeroesService {
     return this.loadingSignal();
   }
 
-  heroesSignal = computed(() => {
+  heroesSignal = computed<Hero[]>(() => {
     const filteredData = this.heroesDB();
     const searchSignal = this.searchSignal();
     const filteredList = this.filterHeroes(filteredData, searchSignal);
@@ -49,7 +49,7 @@ export class HeroesService {
     return paginatedList;
   });
 
-  paginationInfoSignal = computed(() => {
+  paginationInfoSignal = computed<PaginationInfo>(() => {
     const filteredData = this.heroesDB();
     const searchSignal = this.searchSignal();
     const filteredList = this.filterHeroes(filteredData, searchSignal);
@@ -60,13 +60,14 @@ export class HeroesService {
     const prevPage = currentPage > 1 ? currentPage - 1 : null;
     const nextPage = currentPage < totalPages ? currentPage + 1 : null;
 
-    return {
-      totalResults,
-      currentPage,
-      totalPages,
-      prevPage,
-      nextPage,
+    const val: PaginationInfo = {
+      totalResults: totalResults,
+      currentPage: currentPage,
+      totalPages: totalPages,
+      prevPage: prevPage ?? undefined,
+      nextPage: nextPage ?? undefined,
     };
+    return val;
   });
 
   get paginationInfo() {
