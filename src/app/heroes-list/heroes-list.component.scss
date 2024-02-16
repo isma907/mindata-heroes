@@ -49,3 +49,23 @@
         }
     }
 }
+
+
+@media(max-width:1129px) {
+    .hero-list-wrapper {
+        width: 100%;
+
+        .hero-list-paginator {
+            width: 100%;
+            bottom: 0;
+            right: 0;
+        }
+    }
+
+    .hero-list-wrapper-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+
+
+}
