@@ -8,8 +8,23 @@
     box-shadow: 0px 2px 9px -4px #000;
     display: flex;
     align-items: center;
-    gap: 20px;
     flex-wrap: wrap;
+
+    &-left {
+        flex: 3;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    &-right {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        justify-content: end;
+        padding-right: 20px;
+    }
 
     &-form {
         display: flex;
@@ -17,6 +32,8 @@
         flex-wrap: wrap;
     }
 }
+
+
 
 ::ng-deep {
     .search-form-field .mdc-text-field {
@@ -27,4 +44,19 @@
     .mat-mdc-form-field-bottom-align::before {
         display: none
     }
+
+    .header-account {
+        .mdc-button__label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+
+        .user-btn-text {
+            padding-left: 10px;
+            padding-top: 3px;
+        }
+    }
+
 }

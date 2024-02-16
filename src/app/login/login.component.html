@@ -1,0 +1,40 @@
+<div class="login-wrapper">
+  <mat-card class="card-container">
+    <mat-card-content class="card-content">
+      <div class="login-img-thumbnail">
+        <span class="material-symbols-outlined loginIcon"> passkey </span>
+      </div>
+
+      <form (ngSubmit)="login()" [formGroup]="authForm">
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Usuario</mat-label>
+            <input
+              matInput
+              placeholder="Usuario"
+              formControlName="username"
+              type="text"
+            />
+          </mat-form-field>
+        </div>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Contraseña</mat-label>
+            <input
+              matInput
+              placeholder="Contraseña"
+              formControlName="password"
+              type="password"
+            />
+          </mat-form-field>
+        </div>
+
+        <div class="form-row align-center">
+          <button mat-raised-button color="primary" type="submit" [disabled]="loading" >
+            Iniciar sesión
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

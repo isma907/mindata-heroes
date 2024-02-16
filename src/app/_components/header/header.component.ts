@@ -9,14 +9,18 @@ import { Subject } from 'rxjs';
 import { MatSelectModule } from '@angular/material/select';
 import { APP_ROUTES_ENUM } from '../../app.routes';
 import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 import { RouterModule } from '@angular/router';
 import { HeroesService } from '../../_services/heroes.service';
 import { filterData } from '../../_interfaces/filter.interface';
+import { AuthService } from '../../_services/auth.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'mindata-header',
   standalone: true,
   imports: [
+    CommonModule,
     MatIconModule,
     MatToolbarModule,
     MatInputModule,
@@ -25,6 +29,7 @@ import { filterData } from '../../_interfaces/filter.interface';
     ReactiveFormsModule,
     MatButtonModule,
     RouterModule,
+    MatMenuModule,
   ],
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
@@ -32,6 +37,7 @@ import { filterData } from '../../_interfaces/filter.interface';
 export class HeaderComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private heroesService = inject(HeroesService);
+  private authService = inject(AuthService);
   private unsubscribe$: Subject<void> = new Subject<void>();
   appRoute = APP_ROUTES_ENUM;
 
@@ -39,6 +45,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   get loading() {
     return this.heroesService.loading;
+  }
+
+  get loggedUser() {
+    return this.authService.loggedUserData;
+  }
+
+  get isAuth() {
+    return this.authService.isAuthenticated;
   }
 
   ngOnInit(): void {
@@ -63,6 +77,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   resetQuery() {
     this.FilterForm.patchValue({ query: '' });
+  }
+
+  logout() {
+    this.authService.logout();
   }
 
   ngOnDestroy() {

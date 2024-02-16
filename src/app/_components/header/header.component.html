@@ -1,48 +1,71 @@
 <header class="app-header">
-  <form [formGroup]="FilterForm" class="app-header-form">
-    <mat-form-field class="search-form-field" appearance="outline">
-      <mat-label>Filtrar por</mat-label>
-      <mat-select formControlName="filterBy">
-        <mat-option value="_id">ID</mat-option>
-        <mat-option value="name">Nombre</mat-option>
-      </mat-select>
-    </mat-form-field>
+  <div class="app-header-left">
+    <form [formGroup]="FilterForm" class="app-header-form">
+      <mat-form-field class="search-form-field" appearance="outline">
+        <mat-label>Filtrar por</mat-label>
+        <mat-select formControlName="filterBy">
+          <mat-option value="_id">ID</mat-option>
+          <mat-option value="name">Nombre</mat-option>
+        </mat-select>
+      </mat-form-field>
 
-    <mat-form-field class="search-form-field" appearance="outline">
-      <mat-label>Buscar</mat-label>
-      <input
-        matInput
-        placeholder="Buscar"
-        formControlName="query"
-        type="text"
-      />
+      <mat-form-field class="search-form-field" appearance="outline">
+        <mat-label>Buscar</mat-label>
+        <input
+          matInput
+          placeholder="Buscar"
+          formControlName="query"
+          type="text"
+        />
 
-      @if (FilterForm.value.query) {
-      <button
-        matSuffix
-        mat-icon-button
-        aria-label="Clear"
-        (click)="resetQuery()"
-      >
-        <mat-icon>
-          <span class="material-symbols-outlined"> close </span>
-        </mat-icon>
+        @if (FilterForm.value.query) {
+        <button
+          matSuffix
+          mat-icon-button
+          aria-label="Clear"
+          (click)="resetQuery()"
+        >
+          <mat-icon>
+            <span class="material-symbols-outlined"> close </span>
+          </mat-icon>
+        </button>
+        }
+      </mat-form-field>
+    </form>
+
+    <a
+      mat-fab
+      color="warn"
+      [routerLink]="appRoute.HOMEPAGE"
+      (click)="search()"
+      [disabled]="loading"
+    >
+      <mat-icon class="material-symbols-outlined">search</mat-icon>
+    </a>
+
+    @if(isAuth){
+    <a mat-button [routerLink]="appRoute.ADD_HERO">
+      Crear nuevo <mat-icon class="material-symbols-outlined">add</mat-icon>
+    </a>
+    }
+  </div>
+
+  <div class="app-header-right">
+    <div class="header-account">
+      @if(isAuth){
+      <button mat-button [matMenuTriggerFor]="menu">
+        <span class="material-symbols-outlined"> account_circle </span>
+        <span class="user-btn-text">{{ loggedUser.displayName }}</span>
       </button>
+      <mat-menu #menu="matMenu">
+        <button mat-menu-item (click)="logout()">Cerrar sesion</button>
+      </mat-menu>
+      } @else {
+      <a mat-button [routerLink]="appRoute.ADD_HERO">
+        <span class="material-symbols-outlined"> login </span>
+        <span class="user-btn-text">Login</span>
+      </a>
       }
-    </mat-form-field>
-  </form>
-
-  <a
-    mat-fab
-    color="warn"
-    [routerLink]="appRoute.HOMEPAGE"
-    (click)="search()"
-    [disabled]="loading"
-  >
-    <mat-icon class="material-symbols-outlined">search</mat-icon>
-  </a>
-
-  <a mat-button [routerLink]="appRoute.ADD_HERO">
-    Crear nuevo <mat-icon class="material-symbols-outlined">add</mat-icon>
-  </a>
+    </div>
+  </div>
 </header>
