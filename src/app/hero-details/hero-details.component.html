@@ -1,11 +1,14 @@
 <div class="hero-detail-wrapper">
   <mat-card class="card-container">
     <mat-card-content class="card-content">
+      @if(formHero.controls["imageUrl"].valid){
       <img
         src="{{ formHero.get('imageUrl')?.value }}"
         alt=""
         class="card-image-wrapper"
+        (error)="onImageLoadError($event)"
       />
+      }
 
       <div class="card-form-wrapper">
         <form [formGroup]="formHero">

@@ -24,4 +24,5 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
   },
   { path: APP_ROUTES_ENUM.LOGIN, component: LoginComponent },
+  { path: '**', redirectTo: APP_ROUTES_ENUM.HOMEPAGE },
 ];

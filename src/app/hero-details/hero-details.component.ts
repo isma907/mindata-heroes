@@ -104,6 +104,10 @@ export class HeroDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  onImageLoadError(event: Event) {
+    (event.target as HTMLImageElement).src = 'assets/hero-placeholder.jpg';
+  }
+
   ngOnDestroy() {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
