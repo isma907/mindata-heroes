@@ -12,3 +12,10 @@ https://github.com/isma907/mindata-heroes
 run `npm install`
 
 run `npm start`
+
+
+## Credentials
+
+username: mindata
+
+password: mindata
