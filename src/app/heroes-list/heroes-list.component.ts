@@ -9,7 +9,6 @@ import { CommonModule } from '@angular/common';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HeroCardComponent } from '../_components/hero-card/hero-card.component';
 import { Subject, takeUntil } from 'rxjs';
-import { HeaderComponent } from '../_components/header/header.component';
 import { HeroesService } from '../_services/heroes.service';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -27,7 +26,6 @@ import { MatButtonModule } from '@angular/material/button';
     MatProgressSpinnerModule,
     CommonModule,
     HeroCardComponent,
-    HeaderComponent,
     MatPaginatorModule,
     MatSnackBarModule,
     MatButtonModule,
