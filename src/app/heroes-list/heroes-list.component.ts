@@ -1,17 +1,12 @@
 import { Component, OnDestroy, inject } from '@angular/core';
 import { Hero } from '../_interfaces/hero.interface';
-import { MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DeleteConfirmationComponent } from '../_components/confirm-delete/confirm-delete.component';
-import { HttpClientModule } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HeroCardComponent } from '../_components/hero-card/hero-card.component';
 import { Subject, takeUntil } from 'rxjs';
 import { HeroesService } from '../_services/heroes.service';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SnackbarService } from '../_services/snackbar.service';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -19,15 +14,10 @@ import { MatButtonModule } from '@angular/material/button';
   selector: 'mindata-heroes-list',
   standalone: true,
   imports: [
-    HttpClientModule,
-    MatTableModule,
+    CommonModule,
     MatIconModule,
     MatDialogModule,
-    MatProgressSpinnerModule,
-    CommonModule,
     HeroCardComponent,
-    MatPaginatorModule,
-    MatSnackBarModule,
     MatButtonModule,
   ],
   templateUrl: './heroes-list.component.html',
