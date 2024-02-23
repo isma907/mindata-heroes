@@ -19,16 +19,16 @@
         />
 
         @if (FilterForm.value.query) {
-        <button
-          matSuffix
-          mat-icon-button
-          aria-label="Clear"
-          (click)="resetQuery()"
-        >
-          <mat-icon>
-            <span class="material-symbols-outlined"> close </span>
-          </mat-icon>
-        </button>
+          <button
+            matSuffix
+            mat-icon-button
+            aria-label="Clear"
+            (click)="resetQuery()"
+          >
+            <mat-icon>
+              <span class="material-symbols-outlined"> close </span>
+            </mat-icon>
+          </button>
         }
       </mat-form-field>
     </form>
@@ -43,28 +43,28 @@
       <mat-icon class="material-symbols-outlined">search</mat-icon>
     </a>
 
-    @if(isAuth){
-    <a mat-button [routerLink]="appRoute.ADD_HERO">
-      Crear nuevo <mat-icon class="material-symbols-outlined">add</mat-icon>
-    </a>
+    @if (isAuth) {
+      <a mat-button [routerLink]="appRoute.ADD_HERO">
+        Crear nuevo <mat-icon class="material-symbols-outlined">add</mat-icon>
+      </a>
     }
   </div>
 
   <div class="app-header-right">
     <div class="header-account">
-      @if(isAuth){
-      <button mat-button [matMenuTriggerFor]="menu">
-        <span class="material-symbols-outlined"> account_circle </span>
-        <span class="user-btn-text">{{ loggedUser.displayName }}</span>
-      </button>
-      <mat-menu #menu="matMenu">
-        <button mat-menu-item (click)="logout()">Cerrar sesion</button>
-      </mat-menu>
+      @if (isAuth) {
+        <button mat-button [matMenuTriggerFor]="menu">
+          <span class="material-symbols-outlined"> account_circle </span>
+          <span class="user-btn-text">{{ loggedUser.displayName }}</span>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="logout()">Cerrar sesion</button>
+        </mat-menu>
       } @else {
-      <a mat-button [routerLink]="appRoute.ADD_HERO">
-        <span class="material-symbols-outlined"> login </span>
-        <span class="user-btn-text">Login</span>
-      </a>
+        <a mat-button [routerLink]="appRoute.ADD_HERO">
+          <span class="material-symbols-outlined"> login </span>
+          <span class="user-btn-text">Login</span>
+        </a>
       }
     </div>
   </div>

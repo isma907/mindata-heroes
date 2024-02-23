@@ -4,14 +4,14 @@
   </mat-card-header>
   <img mat-card-image src="{{ hero.imageUrl }}" alt="{{ hero.name }}" />
 
-  @if(isAuth){
-  <mat-card-actions align="end">
-    <a mat-button [routerLink]="appRoute.EDIT_HERO + '/' + hero._id">
-      Editar <mat-icon class="material-symbols-outlined">edit</mat-icon>
-    </a>
-    <button mat-button color="warn" (click)="delete(hero)">
-      <mat-icon class="material-symbols-outlined">delete</mat-icon>
-    </button>
-  </mat-card-actions>
+  @if (isAuth) {
+    <mat-card-actions align="end">
+      <a mat-button [routerLink]="appRoute.EDIT_HERO + '/' + hero._id">
+        Editar <mat-icon class="material-symbols-outlined">edit</mat-icon>
+      </a>
+      <button mat-button color="warn" (click)="delete(hero)">
+        <mat-icon class="material-symbols-outlined">delete</mat-icon>
+      </button>
+    </mat-card-actions>
   }
 </mat-card>

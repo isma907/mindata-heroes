@@ -1,13 +1,13 @@
 <div class="hero-detail-wrapper">
   <mat-card class="card-container">
     <mat-card-content class="card-content">
-      @if(formHero.controls["imageUrl"].valid){
-      <img
-        src="{{ formHero.get('imageUrl')?.value }}"
-        alt=""
-        class="card-image-wrapper"
-        (error)="onImageLoadError($event)"
-      />
+      @if (formHero.controls["imageUrl"].valid) {
+        <img
+          src="{{ formHero.get('imageUrl')?.value }}"
+          alt=""
+          class="card-image-wrapper"
+          (error)="onImageLoadError($event)"
+        />
       }
 
       <div class="card-form-wrapper">
@@ -23,7 +23,9 @@
                 name="imageUrl"
               />
               <mat-error>
-                @if(formHero.get('imageUrl')?.errors){ Ingresar una url válida }
+                @if (formHero.get("imageUrl")?.errors) {
+                  Ingresar una url válida
+                }
               </mat-error>
             </mat-form-field>
           </div>
@@ -40,7 +42,9 @@
                 name="name"
               />
               <mat-error>
-                @if(formHero.get('name')?.errors){ Este campo es requerido }
+                @if (formHero.get("name")?.errors) {
+                  Este campo es requerido
+                }
               </mat-error>
             </mat-form-field>
 
@@ -54,8 +58,9 @@
                 name="firstAppearance"
               />
               <mat-error>
-                @if(formHero.get('firstAppearance')?.errors){ Este campo es
-                requerido }
+                @if (formHero.get("firstAppearance")?.errors) {
+                  Este campo es requerido
+                }
               </mat-error>
             </mat-form-field>
 
@@ -69,7 +74,8 @@
                 name="publisher"
               />
               <mat-error>
-                @if(formHero.get('publisher')?.errors){ Este campo es requerido
+                @if (formHero.get("publisher")?.errors) {
+                  Este campo es requerido
                 }
               </mat-error>
             </mat-form-field>

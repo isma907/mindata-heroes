@@ -83,7 +83,7 @@ export class HeroesService {
       tap((res) => {
         this.heroesDB.set(res);
         return res;
-      })
+      }),
     );
   }
 
@@ -98,7 +98,7 @@ export class HeroesService {
     }).pipe(
       finalize(() => {
         this.setLoading(false);
-      })
+      }),
     );
   }
 
@@ -121,7 +121,7 @@ export class HeroesService {
     }).pipe(
       finalize(() => {
         this.setLoading(false);
-      })
+      }),
     );
   }
 
@@ -145,7 +145,7 @@ export class HeroesService {
     }).pipe(
       finalize(() => {
         this.setLoading(false);
-      })
+      }),
     );
   }
   updateHero(hero: Hero): Observable<Hero> {
@@ -171,7 +171,7 @@ export class HeroesService {
     }).pipe(
       finalize(() => {
         this.setLoading(false);
-      })
+      }),
     );
   }
 
@@ -191,13 +191,13 @@ export class HeroesService {
 
     if (isInsertion) {
       const exists = heroList.some(
-        (item) => item.name.toLowerCase() === loweredCaseName
+        (item) => item.name.toLowerCase() === loweredCaseName,
       );
       return exists;
     } else {
       const exists = heroList.some(
         (item) =>
-          item.name.toLowerCase() === loweredCaseName && item._id !== hero._id
+          item.name.toLowerCase() === loweredCaseName && item._id !== hero._id,
       );
       return exists;
     }
@@ -212,7 +212,7 @@ export class HeroesService {
       filteredList = filteredData.filter((hero: Hero) =>
         hero[filterBy as keyof Hero]
           .toLowerCase()
-          .includes(searchTerm.toLocaleLowerCase())
+          .includes(searchTerm.toLocaleLowerCase()),
       );
     }
 

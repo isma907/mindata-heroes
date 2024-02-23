@@ -14,7 +14,7 @@ import { HeroesService } from '../_services/heroes.service';
 
 export const loadingInterceptor: HttpInterceptorFn = (
   req: HttpRequest<any>,
-  next: HttpHandlerFn
+  next: HttpHandlerFn,
 ): Observable<HttpEvent<any>> => {
   const heroesService = inject(HeroesService);
   const snackbarService = inject(SnackbarService);
@@ -28,6 +28,6 @@ export const loadingInterceptor: HttpInterceptorFn = (
     catchError(() => {
       snackbarService.showSnackbar('Oops, algo no salió bien');
       return EMPTY;
-    })
+    }),
   );
 };

@@ -75,7 +75,7 @@ export class HeroDetailsComponent implements OnInit, OnDestroy {
               takeUntil(this.unsubscribe$),
               catchError(() => {
                 return of(EMPTY);
-              })
+              }),
             )
             .subscribe((data) => {
               if (data) {
@@ -97,7 +97,7 @@ export class HeroDetailsComponent implements OnInit, OnDestroy {
         .pipe(takeUntil(this.unsubscribe$))
         .subscribe((hero) => {
           this.snackbarService.showSnackbar(
-            `${heroData.name} guardado correctamente`
+            `${heroData.name} guardado correctamente`,
           );
           this.router.navigate([APP_ROUTES_ENUM.EDIT_HERO + '/' + hero._id]);
         });

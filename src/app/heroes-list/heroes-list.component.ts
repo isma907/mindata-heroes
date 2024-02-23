@@ -62,7 +62,7 @@ export class HeroesListComponent implements OnDestroy {
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe(() => {
               this.snackbarService.showSnackbar(
-                `${hero.name} eliminado correctamente`
+                `${hero.name} eliminado correctamente`,
               );
             });
         }
