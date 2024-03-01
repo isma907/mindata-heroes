@@ -15,7 +15,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { AuthCredentials } from '../_interfaces/auth.interface';
-import { HeroesService } from '../_services/heroes.service';
+import { Store } from '@ngrx/store';
+import { selectLoading } from '../_store/layout/layout.selectors';
 
 @Component({
   selector: 'mindata-login',
@@ -34,15 +35,13 @@ import { HeroesService } from '../_services/heroes.service';
   standalone: true,
 })
 export class LoginComponent implements OnInit {
-  private heroesService = inject(HeroesService);
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private store = inject(Store);
   authForm!: FormGroup;
 
-  get loading() {
-    return this.heroesService.loading;
-  }
+  loading$ = this.store.select(selectLoading);
 
   ngOnInit() {
     this.authForm = this.fb.group({

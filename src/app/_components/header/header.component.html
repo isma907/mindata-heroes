@@ -38,7 +38,7 @@
       color="warn"
       [routerLink]="appRoute.HOMEPAGE"
       (click)="search()"
-      [disabled]="loading"
+      [disabled]="loading$ | async"
     >
       <mat-icon class="material-symbols-outlined">search</mat-icon>
     </a>

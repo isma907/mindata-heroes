@@ -1,20 +1,22 @@
 import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
-
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Subject } from 'rxjs';
 import { MatSelectModule } from '@angular/material/select';
-import { APP_ROUTES_ENUM } from '../../app.routes';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { RouterModule } from '@angular/router';
-import { HeroesService } from '../../_services/heroes.service';
-import { filterData } from '../../_interfaces/filter.interface';
 import { AuthService } from '../../_services/auth.service';
 import { CommonModule } from '@angular/common';
+import { Store } from '@ngrx/store';
+import { setSearch } from '../../_store/search/search.actions';
+import { selectLoading } from '../../_store/layout/layout.selectors';
+import { initialState } from '../../_store/search/search.reducer';
+import { SearchState } from '../../_interfaces/filter.interface';
+import { APP_ROUTES_ENUM } from '../../app.routes';
 
 @Component({
   selector: 'mindata-header',
@@ -35,17 +37,14 @@ import { CommonModule } from '@angular/common';
   styleUrl: './header.component.scss',
 })
 export class HeaderComponent implements OnInit, OnDestroy {
+  private store = inject(Store);
   private fb = inject(FormBuilder);
-  private heroesService = inject(HeroesService);
   private authService = inject(AuthService);
   private unsubscribe$: Subject<void> = new Subject<void>();
+  loading$ = this.store.select(selectLoading);
   appRoute = APP_ROUTES_ENUM;
 
   FilterForm!: FormGroup;
-
-  get loading() {
-    return this.heroesService.loading;
-  }
 
   get loggedUser() {
     return this.authService.loggedUserData;
@@ -64,15 +63,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   search() {
     const formVal = this.FilterForm.value;
-    const query: filterData = {
+    const query: SearchState = {
       filterBy: formVal.filterBy,
       search: formVal.query,
-      limit: this.heroesService.searchSignal().limit,
+      limit: initialState.limit,
       page: 1,
     };
-    this.heroesService.searchSignal.update((data) => {
-      return { data, ...query };
-    });
+
+    this.store.dispatch(setSearch({ payload: query }));
   }
 
   resetQuery() {

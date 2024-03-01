@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { HeroCardComponent } from '../_components/hero-card/hero-card.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideMockStore } from '@ngrx/store/testing';
 
 describe('HeroesListComponent', () => {
   let component: HeroesListComponent;
@@ -21,7 +22,13 @@ describe('HeroesListComponent', () => {
         HttpClientTestingModule,
         HeroCardComponent,
       ],
-      providers: [],
+      providers: [
+        provideMockStore({
+          initialState: {
+            books: null,
+          },
+        }),
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(HeroesListComponent);

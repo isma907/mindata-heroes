@@ -1,7 +1,6 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { Hero } from '../../_interfaces/hero.interface';
 import { CommonModule } from '@angular/common';
-
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';

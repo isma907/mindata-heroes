@@ -9,6 +9,12 @@ import { Subject, takeUntil } from 'rxjs';
 import { HeroesService } from '../_services/heroes.service';
 import { SnackbarService } from '../_services/snackbar.service';
 import { MatButtonModule } from '@angular/material/button';
+import { Store } from '@ngrx/store';
+import * as searchActions from '../_store/search/search.actions';
+import {
+  selectHeroes,
+  selectHeroesPaginationInfo,
+} from '../_store/heroes/heroes.selectors';
 
 @Component({
   selector: 'mindata-heroes-list',
@@ -24,28 +30,20 @@ import { MatButtonModule } from '@angular/material/button';
   styleUrl: './heroes-list.component.scss',
 })
 export class HeroesListComponent implements OnDestroy {
+  private store = inject(Store);
   private unsubscribe$: Subject<void> = new Subject<void>();
   private dialog = inject(MatDialog);
   private snackbarService = inject(SnackbarService);
   private heroesService = inject(HeroesService);
 
+  heroList$ = this.store.select(selectHeroes);
+  heroesPaginationInfo$ = this.store.select(selectHeroesPaginationInfo);
+
   prevPage() {
-    this.heroesService.goPrevPage();
+    this.store.dispatch(searchActions.prevPage());
   }
   nextPage() {
-    this.heroesService.goNextPage();
-  }
-
-  get heroData() {
-    return this.heroesService.getHeroSignal;
-  }
-
-  get loading() {
-    return this.heroesService.loading;
-  }
-
-  get paginationData() {
-    return this.heroesService.paginationInfo;
+    this.store.dispatch(searchActions.nextPage());
   }
 
   delete(hero: Hero) {
@@ -58,7 +56,7 @@ export class HeroesListComponent implements OnDestroy {
       .subscribe((result) => {
         if (result) {
           this.heroesService
-            .removeHero(hero._id)
+            .removeHero(hero)
             .pipe(takeUntil(this.unsubscribe$))
             .subscribe(() => {
               this.snackbarService.showSnackbar(

@@ -34,7 +34,7 @@
             mat-raised-button
             color="primary"
             type="submit"
-            [disabled]="loading"
+            [disabled]="loading$ | async"
           >
             Iniciar sesión
           </button>
