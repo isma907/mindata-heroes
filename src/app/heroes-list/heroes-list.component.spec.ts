@@ -25,7 +25,7 @@ describe('HeroesListComponent', () => {
       providers: [
         provideMockStore({
           initialState: {
-            books: null,
+            heroes: null,
           },
         }),
       ],

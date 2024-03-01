@@ -29,7 +29,7 @@ describe('AppComponent', () => {
         { provide: HeroesService, useValue: spy },
         provideMockStore({
           initialState: {
-            books: null,
+            heroes: null,
           },
         }),
       ],

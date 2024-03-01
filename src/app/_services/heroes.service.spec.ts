@@ -17,7 +17,7 @@ describe('HeroesService', () => {
       providers: [
         provideMockStore({
           initialState: {
-            books: null,
+            heroes: null,
           },
         }),
       ],
