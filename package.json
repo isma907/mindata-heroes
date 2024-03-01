@@ -9,7 +9,8 @@
     "watch": "ng build --watch --configuration development",
     "beautify": "prettier --write \"src/**/*.{html,ts}\"",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "ng lint",
+    "e2e": "npx cypress open"
   },
   "private": true,
   "dependencies": {
@@ -45,6 +46,7 @@
     "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "6.19.0",
     "@typescript-eslint/parser": "6.19.0",
+    "cypress": "^13.6.6",
     "eslint": "^8.56.0",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
