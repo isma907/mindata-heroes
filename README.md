@@ -15,6 +15,13 @@ run `npm start`
 
 Switch to `NGRX branch` to see the NGRX Version
 
+## e2e Testing Cypress
+
+run `npm start`
+
+run `npm run e2e`
+
+
 ## Credentials
 
 username: mindata
