@@ -19,7 +19,8 @@ import { take } from 'rxjs';
   styleUrl: './app.component.scss',
 })
 export class AppComponent implements OnInit {
-  private heroesService = inject(HeroesService);
+  constructor(private heroesService: HeroesService) {}
+
   get loading() {
     return this.heroesService.loading;
   }
