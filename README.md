@@ -13,6 +13,7 @@ run `npm install`
 
 run `npm start`
 
+Switch to `NGRX branch` to see the NGRX Version
 
 ## Credentials
 
