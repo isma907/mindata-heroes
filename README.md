@@ -11,7 +11,7 @@ run `npm install`
 
 run `npm start`
 
-Switch to `NGRX branch` to see the NGRX Version
+Switch to `SIGNALS-Version` to see Angular Signals alternative.
 
 ## e2e Testing Cypress
 
