@@ -38,13 +38,17 @@
       color="warn"
       [routerLink]="appRoute.HOMEPAGE"
       (click)="search()"
-      [disabled]="loading"
+      [disabled]="loading$ | async"
     >
       <mat-icon class="material-symbols-outlined">search</mat-icon>
     </a>
 
     @if (isAuth) {
-      <a mat-button [routerLink]="appRoute.ADD_HERO">
+      <a
+        mat-button
+        [routerLink]="appRoute.ADD_HERO"
+        [disabled]="loading$ | async"
+      >
         Crear nuevo <mat-icon class="material-symbols-outlined">add</mat-icon>
       </a>
     }

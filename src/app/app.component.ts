@@ -1,10 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import {
+  AfterContentChecked,
+  ChangeDetectorRef,
+  Component,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { HeaderComponent } from './_components/header/header.component';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { HeroesService } from './_services/heroes.service';
-import { take } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { selectLoading } from './_store/layout/layout.selectors';
+import * as heroesActions from './_store/heroes/heroes.actions';
 
 @Component({
   selector: 'mindata-app-root',
@@ -18,14 +25,17 @@ import { take } from 'rxjs';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
-export class AppComponent implements OnInit {
-  constructor(private heroesService: HeroesService) {}
+export class AppComponent implements OnInit, AfterContentChecked {
+  private cdRef = inject(ChangeDetectorRef);
+  private store = inject(Store);
 
-  get loading() {
-    return this.heroesService.loading;
-  }
+  loading$ = this.store.select(selectLoading);
 
   ngOnInit(): void {
-    this.heroesService.getHeroesDB().pipe(take(1)).subscribe();
+    this.store.dispatch(heroesActions.loadHeroes());
+  }
+
+  ngAfterContentChecked() {
+    this.cdRef.detectChanges();
   }
 }

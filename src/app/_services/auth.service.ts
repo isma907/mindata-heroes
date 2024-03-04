@@ -33,15 +33,9 @@ export class AuthService {
     return this.loggedUserSignal();
   }
 
-  get loading(): boolean {
-    return this.heroesService.loading;
-  }
-
   login(credentials: AuthCredentials): Observable<boolean> {
     this.heroesService.setLoading(true);
-
     return new Observable<boolean>((observer) => {
-      this.heroesService.setLoading(true);
       setTimeout(() => {
         if (
           credentials.username === mainUser.username &&

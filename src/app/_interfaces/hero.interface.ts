@@ -1,9 +1,5 @@
-export interface PaginationInfo {
-  totalResults?: number;
-  currentPage?: number;
-  totalPages?: number;
-  prevPage?: number;
-  nextPage?: number;
+export interface HeroesStore {
+  list: Hero[];
 }
 
 export interface Hero {

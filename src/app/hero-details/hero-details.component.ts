@@ -20,6 +20,8 @@ import { HeroesService } from '../_services/heroes.service';
 import { SnackbarService } from '../_services/snackbar.service';
 import { APP_ROUTES_ENUM } from '../app.routes';
 import { UpperCaseDirective } from '../_directives/upper-case.directive';
+import { Store } from '@ngrx/store';
+import { selectLoading } from '../_store/layout/layout.selectors';
 
 @Component({
   selector: 'mindata-hero-details',
@@ -45,15 +47,13 @@ export class HeroDetailsComponent implements OnInit, OnDestroy {
   private heroesService = inject(HeroesService);
   private snackbarService = inject(SnackbarService);
   private router = inject(Router);
+  private store = inject(Store);
+  loading$ = this.store.select(selectLoading);
 
   appRoute = APP_ROUTES_ENUM;
 
   formHero!: FormGroup;
   _id: string | null = null;
-
-  get loading() {
-    return this.heroesService.loading;
-  }
 
   ngOnInit() {
     this.formHero = this.fb.group({

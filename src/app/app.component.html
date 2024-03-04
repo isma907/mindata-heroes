@@ -1,6 +1,6 @@
 <div class="main">
   <mindata-header />
-  @if (loading) {
+  @if (loading$ | async) {
     <mat-spinner color="accent" class="main-loader" />
   }
   <router-outlet />

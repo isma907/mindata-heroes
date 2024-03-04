@@ -5,6 +5,7 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { Hero } from '../_interfaces/hero.interface';
+import { provideMockStore } from '@ngrx/store/testing';
 
 describe('HeroesService', () => {
   let service: HeroesService;
@@ -13,6 +14,13 @@ describe('HeroesService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
+      providers: [
+        provideMockStore({
+          initialState: {
+            heroes: null,
+          },
+        }),
+      ],
     });
     service = TestBed.inject(HeroesService);
     httpMock = TestBed.inject(HttpTestingController);
@@ -47,7 +55,6 @@ describe('HeroesService', () => {
 
     const req = httpMock.expectOne('assets/superheroes.json');
     expect(req.request.method).toBe('GET');
-
     req.flush(expectedResponse);
   });
 });

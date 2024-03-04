@@ -1,18 +1,18 @@
 <div class="hero-list-wrapper">
   <section class="hero-list-wrapper-grid">
-    @for (hero of heroData; track hero._id) {
+    @for (hero of heroList$ | async; track hero._id) {
       <mindata-hero-card
         [hero]="hero"
-        (deleteHero)="delete(hero)"
         class="hero-list-item"
+        (deleteHero)="delete(hero)"
       ></mindata-hero-card>
     }
   </section>
 
   <div class="hero-list-paginator">
-    @if (paginationData !== undefined) {
+    @if (heroesPaginationInfo$ | async; as paginationInfo) {
       <div class="totalResults">
-        Resultados: {{ paginationData.totalResults }}
+        Resultados: {{ paginationInfo.totalResults }}
       </div>
     }
 
@@ -21,13 +21,15 @@
       mat-raised-button
       color="primary"
       (click)="prevPage()"
-      [disabled]="!paginationData.prevPage || loading"
+      [disabled]="!(heroesPaginationInfo$ | async)?.prevPage"
     >
       Prev
     </button>
 
     <div class="currentPage">
-      {{ paginationData.currentPage }}
+      @if (heroesPaginationInfo$ | async; as paginationInfo) {
+        {{ paginationInfo.currentPage }}
+      }
     </div>
 
     <button
@@ -35,7 +37,7 @@
       mat-raised-button
       color="primary"
       (click)="nextPage()"
-      [disabled]="!paginationData.nextPage || loading"
+      [disabled]="!(heroesPaginationInfo$ | async)?.nextPage"
     >
       Next
     </button>

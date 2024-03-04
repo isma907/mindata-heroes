@@ -1,16 +1,11 @@
-import {
-  TestBed,
-  ComponentFixture,
-  fakeAsync,
-  tick,
-} from '@angular/core/testing';
+import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { AppComponent } from './app.component';
-import { of } from 'rxjs';
 import { HeroesService } from './_services/heroes.service';
 import { HeaderComponent } from './_components/header/header.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { provideMockStore } from '@ngrx/store/testing';
 
 describe('AppComponent', () => {
   let component: AppComponent;
@@ -30,7 +25,14 @@ describe('AppComponent', () => {
         HeaderComponent,
       ],
       declarations: [],
-      providers: [{ provide: HeroesService, useValue: spy }],
+      providers: [
+        { provide: HeroesService, useValue: spy },
+        provideMockStore({
+          initialState: {
+            heroes: null,
+          },
+        }),
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AppComponent);
@@ -43,13 +45,4 @@ describe('AppComponent', () => {
   it('should create AppComponent', () => {
     expect(component).toBeTruthy();
   });
-
-  it('should call getHeroesDB on ngOnInit', fakeAsync(() => {
-    const getHeroesDBSpy = mockHeroesService.getHeroesDB.and.returnValue(
-      of([]),
-    );
-    component.ngOnInit();
-    expect(getHeroesDBSpy).toHaveBeenCalled();
-    tick();
-  }));
 });

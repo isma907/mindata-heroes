@@ -1,17 +1,28 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
-import { Hero, PaginationInfo } from '../_interfaces/hero.interface';
+import { Injectable, inject } from '@angular/core';
+import { Hero } from '../_interfaces/hero.interface';
 import { HttpClient } from '@angular/common/http';
-import { Observable, finalize, tap } from 'rxjs';
-import { FILTER_BY, filterData } from '../_interfaces/filter.interface';
+import { Observable, finalize, take, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { v4 as uuid } from 'uuid';
 import { SnackbarService } from './snackbar.service';
+import { Store } from '@ngrx/store';
+import { v4 as uuid } from 'uuid';
+import {
+  addHero,
+  removeHero,
+  updateHero,
+} from '../_store/heroes/heroes.actions';
+import {
+  selectHeroById,
+  selectHeroesFeature,
+} from '../_store/heroes/heroes.selectors';
+import { setLoading } from '../_store/layout/layout.actions';
 
 @Injectable({
   providedIn: 'root',
 })
 export class HeroesService {
   http = inject(HttpClient);
+  private store = inject(Store);
   private snackbarService = inject(SnackbarService);
   private heroesEndpoint = `${environment.apiURL}`;
 
@@ -19,69 +30,14 @@ export class HeroesService {
  Se carga la lista entera una vez que se hace GET por primera vez del archivo JSON 
  luego se filtra dentro de la app
   */
-  heroesDB = signal<Hero[]>([]);
 
-  searchSignal = signal<filterData>({
-    filterBy: FILTER_BY.name,
-    limit: 12,
-    page: 1,
-    search: '',
-  });
-
-  loadingSignal = signal<boolean>(false);
   setLoading(enable: boolean) {
-    this.loadingSignal.set(enable);
-  }
-
-  get loading() {
-    return this.loadingSignal();
-  }
-
-  heroesSignal = computed<Hero[]>(() => {
-    const filteredData = this.heroesDB();
-    const searchSignal = this.searchSignal();
-    const filteredList = this.filterHeroes(filteredData, searchSignal);
-
-    const startIndex = (searchSignal.page - 1) * searchSignal.limit;
-    const endIndex = startIndex + searchSignal.limit;
-    const paginatedList = filteredList.slice(startIndex, endIndex);
-
-    return paginatedList;
-  });
-
-  paginationInfoSignal = computed<PaginationInfo>(() => {
-    const filteredData = this.heroesDB();
-    const searchSignal = this.searchSignal();
-    const filteredList = this.filterHeroes(filteredData, searchSignal);
-
-    const totalResults = filteredList.length;
-    const totalPages = Math.ceil(totalResults / searchSignal.limit);
-    const currentPage = searchSignal.page;
-    const prevPage = currentPage > 1 ? currentPage - 1 : null;
-    const nextPage = currentPage < totalPages ? currentPage + 1 : null;
-
-    const val: PaginationInfo = {
-      totalResults: totalResults,
-      currentPage: currentPage,
-      totalPages: totalPages,
-      prevPage: prevPage ?? undefined,
-      nextPage: nextPage ?? undefined,
-    };
-    return val;
-  });
-
-  get paginationInfo() {
-    return this.paginationInfoSignal();
-  }
-
-  get getHeroSignal() {
-    return this.heroesSignal();
+    this.store.dispatch(setLoading({ loading: enable }));
   }
 
   getHeroesDB(): Observable<Hero[]> {
     return this.http.get<Hero[]>(this.heroesEndpoint).pipe(
       tap((res) => {
-        this.heroesDB.set(res);
         return res;
       }),
     );
@@ -90,32 +46,25 @@ export class HeroesService {
   getHeroById(_id: string): Observable<Hero> {
     this.setLoading(true);
     return new Observable<Hero>((observer) => {
-      const hero = this.heroesDB().find((hero) => hero._id === _id);
       setTimeout(() => {
-        observer.next(hero);
-        observer.complete();
+        this.store
+          .select(selectHeroById(_id))
+          .pipe()
+          .subscribe((hero) => {
+            this.setLoading(false);
+            observer.next(hero);
+            observer.complete();
+          });
       }, 1200);
-    }).pipe(
-      finalize(() => {
-        this.setLoading(false);
-      }),
-    );
+    });
   }
 
-  removeHero(id: string): Observable<Hero> {
+  removeHero(hero: Hero): Observable<Hero> {
     this.setLoading(true);
     return new Observable<Hero>((observer) => {
-      const heroToRemove = this.heroesDB().find((hero) => hero._id === id);
-      if (!heroToRemove) {
-        observer.error(`Hero with id ${id} not found`);
-        return;
-      }
-
       setTimeout(() => {
-        this.heroesDB.update((store) => {
-          return store.filter((item) => item._id !== id);
-        });
-        observer.next(heroToRemove);
+        this.store.dispatch(removeHero({ hero }));
+        observer.next();
         observer.complete();
       }, 1200);
     }).pipe(
@@ -129,18 +78,23 @@ export class HeroesService {
     this.setLoading(true);
     return new Observable<Hero>((observer) => {
       setTimeout(() => {
-        if (this.allowedToAdd(hero, true)) {
-          const msg = 'Ya existe un Hero con este nombre';
-          this.snackbarService.showSnackbar(msg);
-          observer.error(msg);
-        } else {
-          const newHero = { ...hero, _id: uuid() };
-          this.heroesDB.update((heroes) => {
-            return [newHero, ...heroes];
+        this.store
+          .select(selectHeroesFeature)
+          .pipe(take(1))
+          .subscribe((store) => {
+            const heroesDB = store.list;
+            const allowAdd = this.allowedToAdd(hero, true, heroesDB);
+            if (allowAdd) {
+              const msg = 'Ya existe un Hero con este nombre';
+              this.snackbarService.showSnackbar(msg);
+              observer.error(msg);
+            } else {
+              const newHero = { ...hero, _id: uuid() };
+              this.store.dispatch(addHero({ hero: newHero }));
+              observer.next(newHero);
+              observer.complete();
+            }
           });
-          observer.next(newHero);
-          observer.complete();
-        }
       }, 1200);
     }).pipe(
       finalize(() => {
@@ -148,25 +102,27 @@ export class HeroesService {
       }),
     );
   }
+
   updateHero(hero: Hero): Observable<Hero> {
     this.setLoading(true);
     return new Observable<Hero>((observer) => {
       setTimeout(() => {
-        if (this.allowedToAdd(hero, false)) {
-          const msg = 'Ya existe un Hero con este nombre';
-          this.snackbarService.showSnackbar(msg);
-          observer.error(msg);
-        } else {
-          this.heroesDB.update((heroes) => {
-            const index = heroes.findIndex((item) => item._id === hero._id);
-            if (index !== -1) {
-              heroes[index] = hero;
+        this.store
+          .select(selectHeroesFeature)
+          .pipe(take(1))
+          .subscribe((store) => {
+            const heroesDB = store.list;
+            const allowAdd = this.allowedToAdd(hero, false, heroesDB);
+            if (allowAdd) {
+              const msg = 'Ya existe un Hero con este nombre';
+              this.snackbarService.showSnackbar(msg);
+              observer.error(msg);
+            } else {
+              this.store.dispatch(updateHero({ hero: hero }));
+              observer.next(hero);
+              observer.complete();
             }
-            return [...heroes];
           });
-          observer.next(hero);
-          observer.complete();
-        }
       }, 1200);
     }).pipe(
       finalize(() => {
@@ -175,47 +131,17 @@ export class HeroesService {
     );
   }
 
-  goNextPage() {
-    const data = this.searchSignal();
-    this.searchSignal.set({ ...data, page: data.page + 1 });
-  }
-
-  goPrevPage() {
-    const data = this.searchSignal();
-    this.searchSignal.set({ ...data, page: data.page - 1 });
-  }
-
-  private allowedToAdd(hero: Hero, isInsertion: boolean) {
-    const heroList = this.heroesDB();
+  private allowedToAdd(hero: Hero, isInsertion: boolean, heroList: Hero[]) {
     const loweredCaseName = hero.name.toLowerCase();
-
     if (isInsertion) {
-      const exists = heroList.some(
+      return heroList.some(
         (item) => item.name.toLowerCase() === loweredCaseName,
       );
-      return exists;
     } else {
-      const exists = heroList.some(
+      return heroList.some(
         (item) =>
           item.name.toLowerCase() === loweredCaseName && item._id !== hero._id,
       );
-      return exists;
     }
-  }
-
-  private filterHeroes(filteredData: Hero[], searchSignal: filterData) {
-    const filterBy = searchSignal.filterBy;
-    let filteredList = filteredData;
-
-    if (filterBy && searchSignal.search) {
-      const searchTerm = searchSignal.search.toLowerCase();
-      filteredList = filteredData.filter((hero: Hero) =>
-        hero[filterBy as keyof Hero]
-          .toLowerCase()
-          .includes(searchTerm.toLocaleLowerCase()),
-      );
-    }
-
-    return filteredList;
   }
 }
