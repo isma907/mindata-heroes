@@ -7,13 +7,18 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Installation
 
-https://github.com/isma907/mindata-heroes
-
 run `npm install`
 
 run `npm start`
 
 Switch to `NGRX branch` to see the NGRX Version
+
+## e2e Testing Cypress
+
+run `npm start`
+
+run `npm run e2e`
+
 
 ## Credentials
 
